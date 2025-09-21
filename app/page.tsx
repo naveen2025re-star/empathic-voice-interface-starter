@@ -1,9 +1,5 @@
 import { getHumeAccessToken } from "@/utils/getHumeAccessToken";
-import dynamic from "next/dynamic";
-
-const ClientWrapper = dynamic(() => import("@/components/ClientWrapper").then(mod => ({ default: mod.ClientWrapper })), {
-  ssr: false,
-});
+import ClientWrapper from "@/components/ClientWrapper";
 
 export default async function Page() {
   const accessToken = await getHumeAccessToken();

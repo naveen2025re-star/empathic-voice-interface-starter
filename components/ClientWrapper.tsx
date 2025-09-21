@@ -50,7 +50,7 @@ function AuthenticatedApp({ accessToken }: { accessToken: string }) {
   );
 }
 
-export function ClientWrapper({ accessToken }: ClientWrapperProps) {
+function ClientWrapper({ accessToken }: ClientWrapperProps) {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
@@ -63,3 +63,5 @@ export function ClientWrapper({ accessToken }: ClientWrapperProps) {
 
   return <AuthenticatedApp accessToken={accessToken} />;
 }
+
+export default ClientWrapper;
