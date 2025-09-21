@@ -72,12 +72,23 @@ export function SessionPrep({ scriptTitle, onStartSession, recentScore }: Sessio
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 flex items-center justify-center p-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto"
+      onClick={(e) => e.target === e.currentTarget && setShowPrep(false)}
     >
-      <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.95, opacity: 0, y: -20 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
+        className="w-full max-w-2xl my-8"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Card className="w-full max-h-[85vh] overflow-hidden shadow-2xl border-0 smooth-modal">
+          <div className="max-h-[85vh] overflow-y-auto custom-scrollbar">
         <CardHeader>
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
@@ -169,24 +180,26 @@ export function SessionPrep({ scriptTitle, onStartSession, recentScore }: Sessio
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-3 pt-4">
+          <div className="flex gap-3 pt-6 border-t border-border/50 sticky bottom-0 bg-background/95 backdrop-blur-sm -mx-6 px-6 pb-6 mt-6">
             <Button 
               variant="outline" 
               onClick={() => setShowPrep(false)}
-              className="flex-1"
+              className="flex-1 hover:bg-muted/80 transition-colors duration-200"
             >
               Skip Prep
             </Button>
             <Button 
               onClick={handleStartSession}
-              className="flex-1 flex items-center gap-2"
+              className="flex-1 flex items-center gap-2 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary transition-all duration-200 shadow-lg hover:shadow-xl"
             >
               <Target className="size-4" />
               Start Practice Session
             </Button>
           </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </div>
+        </Card>
+      </motion.div>
     </motion.div>
   );
 }
