@@ -18,7 +18,7 @@ const CoachingFeedback = dynamic(() => import("./CoachingFeedback"), {
   ssr: false
 });
 import { AuthenticatedNav } from "./AuthenticatedNav";
-import { ComponentRef, useRef, useState, useEffect } from "react";
+import { ComponentRef, useRef, useState, useEffect, useCallback, useMemo, memo } from "react";
 import { toast } from "sonner";
 import { calculateSalesMetrics, generateCoachingFeedback } from "@/utils/salesCoaching";
 import { saveSession, SessionData, getSessionHistory } from "@/utils/sessionStorage";
@@ -40,9 +40,9 @@ export default function ClientComponent({
   // optional: use configId from environment variable
   const configId = process.env['NEXT_PUBLIC_HUME_CONFIG_ID'];
   
-  const handleScriptSelect = (script: string, title: string) => {
+  const handleScriptSelect = useCallback((script: string, title: string) => {
     setSelectedScript({ script, title });
-  };
+  }, []);
 
   return (
     <>
@@ -126,10 +126,17 @@ const SalesCoachingSession = ({
     setSessionReady(false);
   }, [selectedScript?.title]);
 
-  // Get the latest user message emotions for coaching feedback
-  const userMessages = messages?.filter(m => m.type === 'user_message') || [];
-  const latestUserMessage = userMessages[userMessages.length - 1];
-  const emotionsData = latestUserMessage?.models?.prosody?.scores || {};
+  // Get the latest user message emotions for coaching feedback (memoized)
+  const { userMessages, latestUserMessage, emotionsData } = useMemo(() => {
+    const msgs = messages?.filter(m => m.type === 'user_message') || [];
+    const latest = msgs[msgs.length - 1];
+    const emotions = latest?.models?.prosody?.scores || {};
+    return {
+      userMessages: msgs,
+      latestUserMessage: latest, 
+      emotionsData: emotions
+    };
+  }, [messages]);
   
   // Track session start/end and collect data
   useEffect(() => {
@@ -143,14 +150,28 @@ const SalesCoachingSession = ({
         const sessionDuration = Date.now() - sessionStartTime;
       
         if (allMetrics.length > 0 && sessionDuration > 10000) { // Only save sessions longer than 10 seconds
-        const averageMetrics = {
-          confidence: allMetrics.reduce((sum, m) => sum + m.confidence, 0) / allMetrics.length,
-          enthusiasm: allMetrics.reduce((sum, m) => sum + m.enthusiasm, 0) / allMetrics.length,
-          persuasiveness: allMetrics.reduce((sum, m) => sum + m.persuasiveness, 0) / allMetrics.length,
-          authenticity: allMetrics.reduce((sum, m) => sum + m.authenticity, 0) / allMetrics.length,
-          nervousness: allMetrics.reduce((sum, m) => sum + m.nervousness, 0) / allMetrics.length,
-          overall_score: allMetrics.reduce((sum, m) => sum + m.overall_score, 0) / allMetrics.length
-        };
+        // Optimized metrics calculation
+        const metricsCount = allMetrics.length;
+        const averageMetrics = allMetrics.reduce((acc, m) => ({
+          confidence: acc.confidence + m.confidence,
+          enthusiasm: acc.enthusiasm + m.enthusiasm,
+          persuasiveness: acc.persuasiveness + m.persuasiveness,
+          authenticity: acc.authenticity + m.authenticity,
+          nervousness: acc.nervousness + m.nervousness,
+          overall_score: acc.overall_score + m.overall_score
+        }), {
+          confidence: 0,
+          enthusiasm: 0,
+          persuasiveness: 0,
+          authenticity: 0,
+          nervousness: 0,
+          overall_score: 0
+        });
+
+        // Calculate averages
+        Object.keys(averageMetrics).forEach(key => {
+          averageMetrics[key as keyof typeof averageMetrics] /= metricsCount;
+        });
         
         // Create conversation summary
         const conversationSummary = {
@@ -188,16 +209,20 @@ const SalesCoachingSession = ({
     }
   }, [isConnected, sessionStartTime, selectedScript, allMetrics, allFeedback, userMessages.length]);
   
-  // Collect metrics from each user message
+  // Collect metrics from each user message (debounced for performance)
   useEffect(() => {
     if (emotionsData && Object.keys(emotionsData).length > 0) {
-      const metrics = calculateSalesMetrics(emotionsData);
-      setAllMetrics(prev => [...prev, metrics]);
-      
-      // Collect coaching feedback
-      const feedback = generateCoachingFeedback(emotionsData);
-      const feedbackMessages = feedback.map(f => f.message);
-      setAllFeedback(prev => [...prev, ...feedbackMessages]);
+      const timer = setTimeout(() => {
+        const metrics = calculateSalesMetrics(emotionsData);
+        setAllMetrics(prev => [...prev, metrics]);
+        
+        // Collect coaching feedback
+        const feedback = generateCoachingFeedback(emotionsData);
+        const feedbackMessages = feedback.map(f => f.message);
+        setAllFeedback(prev => [...prev, ...feedbackMessages]);
+      }, 150); // Debounce for 150ms to prevent excessive updates
+
+      return () => clearTimeout(timer);
     }
   }, [latestUserMessage]); // Trigger when a new message arrives
 

@@ -3,7 +3,7 @@ import { cn } from "@/utils";
 import { useVoice } from "@humeai/voice-react";
 import Expressions from "./Expressions";
 import { AnimatePresence, motion } from "framer-motion";
-import { ComponentRef, forwardRef } from "react";
+import { ComponentRef, forwardRef, memo, useMemo } from "react";
 
 const Messages = forwardRef<
   ComponentRef<typeof motion.div>,
@@ -11,24 +11,31 @@ const Messages = forwardRef<
 >(function Messages(_, ref) {
   const { messages } = useVoice();
 
+  // Memoize filtered messages for performance
+  const filteredMessages = useMemo(() => {
+    return messages.filter(msg => 
+      msg.type === "user_message" || msg.type === "assistant_message"
+    );
+  }, [messages]);
+
   return (
     <motion.div
       layoutScroll
-      className={"grow overflow-auto p-4 pt-24"}
+      className={"grow overflow-auto p-4 pt-24 custom-scrollbar"}
       ref={ref}
+      style={{
+        // Hardware acceleration for smooth scrolling
+        transform: 'translateZ(0)',
+        willChange: 'scroll-position'
+      }}
     >
       <motion.div
         className={"max-w-2xl mx-auto w-full flex flex-col gap-4 pb-24"}
       >
         <AnimatePresence mode={"popLayout"}>
-          {messages.map((msg, index) => {
-            if (
-              msg.type === "user_message" ||
-              msg.type === "assistant_message"
-            ) {
-              return (
+          {filteredMessages.map((msg, index) => (
                 <motion.div
-                  key={msg.type + index}
+                  key={`${msg.type}-${index}`}
                   className={cn(
                     "w-[80%]",
                     "bg-card",
@@ -46,6 +53,15 @@ const Messages = forwardRef<
                   exit={{
                     opacity: 0,
                     y: 0,
+                  }}
+                  transition={{
+                    duration: 0.2,
+                    ease: "easeOut"
+                  }}
+                  style={{
+                    // GPU acceleration
+                    transform: 'translateZ(0)',
+                    willChange: 'transform, opacity'
                   }}
                 >
                   <div className={"flex items-center justify-between pt-4 px-3"}>
@@ -71,15 +87,12 @@ const Messages = forwardRef<
                   <div className={"pb-3 px-3"}>{msg.message.content}</div>
                   <Expressions values={{ ...msg.models.prosody?.scores }} />
                 </motion.div>
-              );
-            }
-
-            return null;
-          })}
+              ))
         </AnimatePresence>
       </motion.div>
     </motion.div>
   );
 });
 
-export default Messages;
+// Memoize the component to prevent unnecessary re-renders
+export default memo(Messages);

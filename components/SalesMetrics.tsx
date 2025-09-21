@@ -1,7 +1,7 @@
 "use client";
 import { calculateSalesMetrics, SalesMetrics as ISalesMetrics } from "@/utils/salesCoaching";
 import { motion } from "framer-motion";
-import { CSSProperties } from "react";
+import { CSSProperties, memo, useMemo } from "react";
 import { TrendingUp, TrendingDown, Zap, Heart, Shield, Target } from "lucide-react";
 
 interface SalesMetricsProps {
@@ -41,18 +41,21 @@ const metricConfig = {
   }
 };
 
-export default function SalesMetrics({ values }: SalesMetricsProps) {
-  const metrics = calculateSalesMetrics(values);
+function SalesMetrics({ values }: SalesMetricsProps) {
+  // Memoize metrics calculation for performance
+  const metrics = useMemo(() => calculateSalesMetrics(values), [values]);
   
-  // Convert metrics object to array and sort by value (excluding overall_score)
-  const sortedMetrics = Object.entries(metrics)
-    .filter(([key]) => key !== 'overall_score' && key in metricConfig)
-    .map(([key, value]) => ({
-      key: key as keyof typeof metricConfig,
-      value: key === 'nervousness' ? value : value,
-      displayValue: key === 'nervousness' ? (1 - value) : value // Invert nervousness for display
-    }))
-    .sort((a, b) => b.displayValue - a.displayValue);
+  // Memoize sorted metrics to prevent recalculation on every render
+  const sortedMetrics = useMemo(() => {
+    return Object.entries(metrics)
+      .filter(([key]) => key !== 'overall_score' && key in metricConfig)
+      .map(([key, value]) => ({
+        key: key as keyof typeof metricConfig,
+        value: key === 'nervousness' ? value : value,
+        displayValue: key === 'nervousness' ? (1 - value) : value // Invert nervousness for display
+      }))
+      .sort((a, b) => b.displayValue - a.displayValue);
+  }, [metrics]);
 
   return (
     <div className="p-4 w-full">
@@ -122,3 +125,6 @@ export default function SalesMetrics({ values }: SalesMetricsProps) {
     </div>
   );
 }
+
+// Memoize component to prevent unnecessary re-renders
+export default memo(SalesMetrics);
