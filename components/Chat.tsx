@@ -158,6 +158,7 @@ const SalesCoachingSession = ({
   const [allFeedback, setAllFeedback] = useState<string[]>([]);
   const [recentScore, setRecentScore] = useState<number | null>(null);
   const [sessionReady, setSessionReady] = useState(false);
+  const [currentCoachingTips, setCurrentCoachingTips] = useState<any[]>([]);
   
   // Reset session prep when script changes
   useEffect(() => {
@@ -294,7 +295,7 @@ const SalesCoachingSession = ({
         
         {isConnected && emotionsData && Object.keys(emotionsData).length > 0 && (
           <div className="w-80 border-l bg-muted/20">
-            <SalesMetrics values={emotionsData} />
+            <SalesMetrics values={emotionsData} coachingTips={currentCoachingTips} />
           </div>
         )}
       </div>
@@ -324,6 +325,7 @@ const SalesCoachingSession = ({
       <CoachingFeedback 
         emotions={emotionsData} 
         isVisible={isConnected && Object.keys(emotionsData).length > 0}
+        onFeedbackUpdate={setCurrentCoachingTips}
       />
     </>
   );

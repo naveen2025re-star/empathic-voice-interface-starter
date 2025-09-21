@@ -1,11 +1,13 @@
 "use client";
-import { calculateSalesMetrics, SalesMetrics as ISalesMetrics } from "@/utils/salesCoaching";
+import { calculateSalesMetrics, SalesMetrics as ISalesMetrics, CoachingFeedback as ICoachingFeedback } from "@/utils/salesCoaching";
 import { motion } from "framer-motion";
 import { CSSProperties, memo, useMemo } from "react";
 import { TrendingUp, TrendingDown, Zap, Heart, Shield, Target } from "lucide-react";
+import { CoachingTipsPanel } from "./CoachingFeedback";
 
 interface SalesMetricsProps {
   values: Record<string, number>;
+  coachingTips?: ICoachingFeedback[];
 }
 
 const metricConfig = {
@@ -41,7 +43,7 @@ const metricConfig = {
   }
 };
 
-function SalesMetrics({ values }: SalesMetricsProps) {
+function SalesMetrics({ values, coachingTips = [] }: SalesMetricsProps) {
   // Memoize metrics calculation for performance
   const metrics = useMemo(() => calculateSalesMetrics(values), [values]);
   
@@ -121,6 +123,11 @@ function SalesMetrics({ values }: SalesMetricsProps) {
             </div>
           );
         })}
+      </div>
+
+      {/* Coaching Tips Section */}
+      <div className="mt-6 pt-4 border-t">
+        <CoachingTipsPanel tips={coachingTips} />
       </div>
     </div>
   );
