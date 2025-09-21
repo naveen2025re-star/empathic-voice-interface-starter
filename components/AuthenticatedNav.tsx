@@ -36,8 +36,10 @@ export function AuthenticatedNav() {
   }
 
   const handleLogout = () => {
-    // Use proper logout endpoint
-    window.location.href = '/api/auth/logout';
+    // Clear demo session
+    sessionStorage.removeItem('demo_user');
+    // Redirect to home
+    window.location.href = '/';
   };
 
   return (
