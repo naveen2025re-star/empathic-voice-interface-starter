@@ -48,7 +48,7 @@ export function LandingPage() {
               <Button 
                 size="lg" 
                 className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3 text-lg"
-                onClick={() => window.location.href = '/auth-demo'}
+                onClick={() => window.location.href = '/api/login'}
               >
                 Start Training Now
                 <ArrowRight className="ml-2 h-5 w-5" />

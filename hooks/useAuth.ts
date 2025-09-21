@@ -1,15 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 async function fetchUser() {
-  // Check for demo user in sessionStorage first
-  if (typeof window !== 'undefined') {
-    const demoUser = sessionStorage.getItem('demo_user');
-    if (demoUser) {
-      return JSON.parse(demoUser);
-    }
-  }
-
-  // Otherwise check real auth endpoint
+  // Check real auth endpoint
   const response = await fetch("/api/auth/user");
   if (!response.ok) {
     if (response.status === 401) {
