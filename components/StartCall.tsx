@@ -61,6 +61,7 @@ Stay in character as the prospect, but occasionally provide coaching tips like "
                     auth: { type: "accessToken", value: accessToken },
                     configId,
                     sessionSettings: {
+                      type: "voice_chat",
                       systemPrompt: systemPrompt
                     }
                   })
