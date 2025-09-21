@@ -22,6 +22,7 @@ export const Nav = () => {
           variant={"ghost"}
           size={"sm"}
           className={"flex items-center gap-1.5 rounded-full"}
+          onClick={() => window.location.href = '/performance'}
         >
           <TrendingUp className={"size-4"} />
           <span className={"hidden sm:inline"}>Performance</span>
