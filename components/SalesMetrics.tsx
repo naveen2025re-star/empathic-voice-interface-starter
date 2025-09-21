@@ -3,7 +3,7 @@ import { calculateSalesMetrics, SalesMetrics as ISalesMetrics, CoachingFeedback 
 import { motion } from "framer-motion";
 import { CSSProperties, memo, useMemo } from "react";
 import { TrendingUp, TrendingDown, Zap, Heart, Shield, Target } from "lucide-react";
-import CoachingTipsPanel from "./CoachingTipsPanel";
+import CoachingTipsPanel from "@/components/CoachingTipsPanel";
 
 interface SalesMetricsProps {
   values: Record<string, number>;
@@ -127,7 +127,19 @@ function SalesMetrics({ values, coachingTips = [] }: SalesMetricsProps) {
 
       {/* Coaching Tips Section */}
       <div className="mt-6 pt-4 border-t">
-        <CoachingTipsPanel tips={coachingTips} />
+        {CoachingTipsPanel ? (
+          <CoachingTipsPanel tips={coachingTips} />
+        ) : (
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+              <Target className="size-4" />
+              <span>Coaching Tips</span>
+            </div>
+            <div className="text-xs text-muted-foreground p-2 rounded bg-muted/30">
+              Start speaking to get personalized coaching tips!
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
