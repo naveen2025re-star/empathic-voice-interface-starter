@@ -43,10 +43,10 @@ function AuthenticatedApp({ accessToken }: { accessToken: string }) {
   }
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <ClientComponent accessToken={accessToken} />
       {showWelcome && <WelcomeGuide onComplete={handleWelcomeComplete} />}
-    </>
+    </div>
   );
 }
 

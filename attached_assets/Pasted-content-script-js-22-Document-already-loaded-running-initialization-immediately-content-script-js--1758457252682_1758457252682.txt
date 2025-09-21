@@ -1,0 +1,34 @@
+content-script.js:22 Document already loaded, running initialization immediately
+content-script.js:4 Attempting to initialize AdUnit
+content-script.js:6 AdUnit initialized successfully
+react-dom.development.js:38560 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+app-index.js:33 Warning: Extra attributes from the server: bis_skin_checked
+    at div
+    at div
+    at Nav (webpack-internal:///(app-pages-browser)/./components/Nav.tsx:21:86)
+    at V (webpack-internal:///(app-pages-browser)/./node_modules/next-themes/dist/index.mjs:54:24)
+    at J (webpack-internal:///(app-pages-browser)/./node_modules/next-themes/dist/index.mjs:47:47)
+    at ThemeProvider (webpack-internal:///(app-pages-browser)/./components/ThemeProvider.tsx:13:11)
+    at QueryClientProvider (webpack-internal:///(app-pages-browser)/./node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:27:11)
+    at QueryProvider (webpack-internal:///(app-pages-browser)/./components/QueryProvider.tsx:15:11)
+    at body
+    at html
+    at RedirectErrorBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/redirect-boundary.js:74:9)
+    at RedirectBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/redirect-boundary.js:82:11)
+    at NotFoundErrorBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/not-found-boundary.js:76:9)
+    at NotFoundBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/not-found-boundary.js:84:11)
+    at DevRootNotFoundBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/dev-root-not-found-boundary.js:33:11)
+    at ReactDevOverlay (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/ReactDevOverlay.js:87:9)
+    at HotReload (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:321:11)
+    at Router (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/app-router.js:207:11)
+    at ErrorBoundaryHandler (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/error-boundary.js:113:9)
+    at ErrorBoundary (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/error-boundary.js:160:11)
+    at AppRouter (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/app-router.js:577:13)
+    at ServerRoot (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:112:27)
+    at Root (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:117:11)
+window.console.error @ app-index.js:33
+/api/auth/user:1  Failed to load resource: the server responded with a status of 401 (Unauthorized)
+(index):1 The resource https://3906cd95-ed2b-4139-8d11-e3abf5a39881-00-44ep05qntpxs.riker.replit.dev/_next/static/media/5b01f339abf2f1a5.p.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+(index):1 The resource https://3906cd95-ed2b-4139-8d11-e3abf5a39881-00-44ep05qntpxs.riker.replit.dev/_next/static/media/028c0d39d2e8f589-s.p.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+hot-reloader-client.js:187 [Fast Refresh] rebuilding
+hot-reloader-client.js:44 [Fast Refresh] done in 1196ms

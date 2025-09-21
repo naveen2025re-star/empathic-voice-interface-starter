@@ -7,6 +7,7 @@ import StartCall from "./StartCall";
 import SalesScriptSelector from "./SalesScriptSelector";
 import SalesMetrics from "./SalesMetrics";
 import CoachingFeedback from "./CoachingFeedback";
+import { AuthenticatedNav } from "./AuthenticatedNav";
 import { ComponentRef, useRef, useState, useEffect } from "react";
 import { toast } from "sonner";
 import { calculateSalesMetrics, generateCoachingFeedback } from "@/utils/salesCoaching";
@@ -31,8 +32,10 @@ export default function ClientComponent({
   };
 
   return (
-    <div className="relative grow flex flex-col mx-auto w-full overflow-hidden h-[0px] pt-14">
-      <VoiceProvider
+    <>
+      <AuthenticatedNav />
+      <div className="relative grow flex flex-col mx-auto w-full overflow-hidden h-[0px] pt-14">
+        <VoiceProvider
         onMessage={() => {
           if (timeout.current) {
             window.clearTimeout(timeout.current);
@@ -60,8 +63,9 @@ export default function ClientComponent({
           accessToken={accessToken}
           messagesRef={ref}
         />
-      </VoiceProvider>
-    </div>
+        </VoiceProvider>
+      </div>
+    </>
   );
 }
 
