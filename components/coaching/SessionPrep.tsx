@@ -68,6 +68,11 @@ export function SessionPrep({ scriptTitle, onStartSession, recentScore }: Sessio
     setTimeout(onStartSession, 300);
   };
 
+  const handleSkipPrep = () => {
+    setShowPrep(false);
+    setTimeout(onStartSession, 300); // Same flow as Start Session
+  };
+
   if (!showPrep) return null;
 
   return (
@@ -77,7 +82,7 @@ export function SessionPrep({ scriptTitle, onStartSession, recentScore }: Sessio
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
       className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto"
-      onClick={(e) => e.target === e.currentTarget && setShowPrep(false)}
+      onClick={(e) => e.target === e.currentTarget && handleSkipPrep()}
     >
       <motion.div
         initial={{ scale: 0.95, opacity: 0, y: 20 }}
@@ -183,7 +188,7 @@ export function SessionPrep({ scriptTitle, onStartSession, recentScore }: Sessio
           <div className="flex gap-3 pt-6 border-t border-border/50 sticky bottom-0 bg-background/95 backdrop-blur-sm -mx-6 px-6 pb-6 mt-6">
             <Button 
               variant="outline" 
-              onClick={() => setShowPrep(false)}
+              onClick={handleSkipPrep}
               className="flex-1 hover:bg-muted/80 transition-colors duration-200"
             >
               Skip Prep

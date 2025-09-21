@@ -47,7 +47,7 @@ export default function ClientComponent({
   return (
     <>
       <AuthenticatedNav />
-      <div className="relative grow flex flex-col mx-auto w-full overflow-hidden h-[0px] pt-14">
+      <div className="relative grow flex flex-col mx-auto w-full overflow-auto min-h-0 pt-14">
         <VoiceProvider
         onMessage={() => {
           if (timeout.current) {

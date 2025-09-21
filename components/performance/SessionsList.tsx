@@ -27,7 +27,7 @@ export function SessionsList({ sessions, formatDate, formatDuration }: SessionsL
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Calendar className="size-4" />
-                    {formatDate(session.timestamp)}
+                    {formatDate(session.createdAt?.getTime() || Date.now())}
                   </div>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Clock className="size-4" />
