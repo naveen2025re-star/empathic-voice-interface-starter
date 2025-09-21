@@ -67,51 +67,100 @@ export const generateCoachingFeedback = (emotions: Record<string, number>): Coac
   const metrics = calculateSalesMetrics(emotions);
   const feedback: CoachingFeedback[] = [];
 
-  // Confidence feedback
-  if (metrics.confidence < 0.3) {
+  // Always generate feedback when metrics are available
+  if (Object.keys(emotions).length === 0) {
+    return feedback;
+  }
+
+  // Confidence feedback - more aggressive thresholds
+  if (metrics.confidence < 0.5) {
     feedback.push({
-      message: "Your confidence seems low. Try speaking slower and emphasizing key points.",
-      type: 'improvement',
+      message: metrics.confidence < 0.3 
+        ? "Your confidence seems very low. Speak slower, emphasize key points, and project authority."
+        : "Boost your confidence by slowing down and emphasizing the value you bring.",
+      type: metrics.confidence < 0.3 ? 'warning' : 'improvement',
       category: 'confidence'
     });
   } else if (metrics.confidence > 0.7) {
     feedback.push({
-      message: "Great confidence! Your conviction is coming through clearly.",
+      message: "Excellent confidence! Your conviction is compelling and trustworthy.",
       type: 'positive',
       category: 'confidence'
     });
   }
 
-  // Enthusiasm feedback
-  if (metrics.enthusiasm < 0.3) {
+  // Enthusiasm feedback - more aggressive thresholds  
+  if (metrics.enthusiasm < 0.5) {
     feedback.push({
-      message: "Add more energy to your delivery. Your passion for the product should shine through.",
-      type: 'improvement',
+      message: metrics.enthusiasm < 0.3
+        ? "Your energy is very low. Show passion for your solution - enthusiasm is contagious!"
+        : "Add more energy to your delivery. Let your excitement about the product show.",
+      type: metrics.enthusiasm < 0.3 ? 'warning' : 'improvement',
       category: 'energy'
     });
   } else if (metrics.enthusiasm > 0.7) {
     feedback.push({
-      message: "Excellent energy! Your enthusiasm is engaging and compelling.",
+      message: "Great energy! Your enthusiasm is engaging and compelling.",
       type: 'positive',
       category: 'energy'
     });
   }
 
-  // Nervousness feedback
-  if (metrics.nervousness > 0.5) {
+  // Nervousness feedback - more sensitive
+  if (metrics.nervousness > 0.4) {
     feedback.push({
-      message: "Take a deep breath and pause. Nervousness can undermine your message.",
-      type: 'warning',
+      message: metrics.nervousness > 0.6
+        ? "High nervousness detected. Take deep breaths and pause between sentences."
+        : "You sound a bit nervous. Slow down and speak with more authority.",
+      type: metrics.nervousness > 0.6 ? 'warning' : 'improvement',
       category: 'delivery'
     });
   }
 
-  // Persuasiveness feedback
-  if (metrics.persuasiveness < 0.4) {
+  // Persuasiveness feedback - more aggressive
+  if (metrics.persuasiveness < 0.5) {
     feedback.push({
-      message: "Focus on building rapport and showing genuine interest in the customer's needs.",
+      message: metrics.persuasiveness < 0.3
+        ? "Focus on the customer's pain points and clearly articulate how you solve them."
+        : "Build more rapport and show genuine interest in the customer's specific needs.",
+      type: metrics.persuasiveness < 0.3 ? 'warning' : 'improvement', 
+      category: 'authenticity'
+    });
+  } else if (metrics.persuasiveness > 0.7) {
+    feedback.push({
+      message: "Very persuasive delivery! You're effectively building the business case.",
+      type: 'positive',
+      category: 'authenticity'
+    });
+  }
+
+  // Authenticity feedback
+  if (metrics.authenticity < 0.5) {
+    feedback.push({
+      message: "Sound more genuine by personalizing your approach and asking thoughtful questions.",
       type: 'improvement',
       category: 'authenticity'
+    });
+  } else if (metrics.authenticity > 0.7) {
+    feedback.push({
+      message: "You sound authentic and trustworthy - keep building that connection!",
+      type: 'positive',
+      category: 'authenticity'
+    });
+  }
+
+  // Overall performance feedback
+  if (metrics.overall_score < 0.4) {
+    feedback.push({
+      message: "Overall performance needs improvement. Focus on confidence, energy, and connecting with the customer.",
+      type: 'warning',
+      category: 'delivery'
+    });
+  } else if (metrics.overall_score > 0.7) {
+    feedback.push({
+      message: "Strong overall performance! You're hitting the key sales fundamentals.",
+      type: 'positive',
+      category: 'confidence'
     });
   }
 

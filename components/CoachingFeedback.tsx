@@ -28,10 +28,15 @@ export default function CoachingFeedback({ emotions, isVisible, onFeedbackUpdate
   const [recentTips, setRecentTips] = useState<ICoachingFeedback[]>([]);
 
   useEffect(() => {
+    console.log('🎯 CoachingFeedback: Effect triggered', { isVisible, emotions, emotionsCount: Object.keys(emotions).length });
+    
     if (isVisible && Object.keys(emotions).length > 0) {
+      console.log('🎯 CoachingFeedback: Generating feedback for emotions:', emotions);
       const newFeedback = generateCoachingFeedback(emotions);
+      console.log('🎯 CoachingFeedback: Generated feedback:', newFeedback);
       
       if (newFeedback.length > 0) {
+        console.log('🎯 CoachingFeedback: Sending feedback to parent component');
         // Send feedback to parent component for sidebar display
         onFeedbackUpdate?.(newFeedback);
         setRecentTips(newFeedback);
@@ -54,7 +59,27 @@ export default function CoachingFeedback({ emotions, isVisible, onFeedbackUpdate
             }, index * 500);
           }
         });
+      } else {
+        console.log('🎯 CoachingFeedback: No feedback generated - trying fallback');
+        // Force generate some feedback for testing
+        const fallbackFeedback = [
+          {
+            message: "Try speaking with more confidence and energy.",
+            type: 'improvement' as const,
+            category: 'confidence' as const
+          },
+          {
+            message: "Take a deep breath and slow down your pace.",
+            type: 'warning' as const,
+            category: 'delivery' as const
+          }
+        ];
+        console.log('🎯 CoachingFeedback: Sending fallback feedback:', fallbackFeedback);
+        onFeedbackUpdate?.(fallbackFeedback);
+        setRecentTips(fallbackFeedback);
       }
+    } else {
+      console.log('🎯 CoachingFeedback: Not visible or no emotions data', { isVisible, emotionsCount: Object.keys(emotions).length });
     }
   }, [emotions, isVisible, onFeedbackUpdate]);
 
