@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 export function AuthenticatedNav() {
   const [mounted, setMounted] = useState(false);
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   // Avoid hydration mismatch by only rendering after mount
   useEffect(() => {
@@ -35,11 +35,15 @@ export function AuthenticatedNav() {
     );
   }
 
-  const handleLogout = () => {
-    // Clear demo session
-    sessionStorage.removeItem('demo_user');
-    // Redirect to home
-    window.location.href = '/';
+  const handleLogout = async () => {
+    try {
+      await logout();
+      // Logout hook already handles redirect
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Force redirect anyway if logout fails
+      window.location.href = '/';
+    }
   };
 
   return (

@@ -98,7 +98,11 @@ export function useAuth() {
   const logoutMutation = useMutation({
     mutationFn: logoutUser,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      // Clear all cached data and force re-fetch
+      queryClient.removeQueries({ queryKey: ["/api/auth/user"] });
+      queryClient.clear(); // Clear all cache
+      // Force immediate redirect
+      window.location.href = '/';
     },
   });
 
