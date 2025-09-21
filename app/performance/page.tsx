@@ -144,6 +144,7 @@ export default function PerformancePage() {
               </Button>
             </div>
           )}
+        </div>
 
         {sessions.length === 0 ? (
           <Card className="text-center py-12">
@@ -309,7 +310,7 @@ export default function PerformancePage() {
                         </div>
                       )}
                     </div>
-                  ))
+                  ))}
                 </div>
               </CardContent>
             </Card>
