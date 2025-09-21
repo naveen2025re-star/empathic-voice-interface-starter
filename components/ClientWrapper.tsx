@@ -3,12 +3,22 @@
 import { useState, useEffect } from "react";
 import ClientComponent from "@/components/Chat";
 import { WelcomeGuide } from "@/components/onboarding/WelcomeGuide";
+import { LandingPage } from "@/components/LandingPage";
+import { useAuth } from "@/hooks/useAuth";
 
 interface ClientWrapperProps {
   accessToken: string;
 }
 
-export function ClientWrapper({ accessToken }: ClientWrapperProps) {
+function LoadingSpinner() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400"></div>
+    </div>
+  );
+}
+
+function AuthenticatedApp({ accessToken }: { accessToken: string }) {
   const [showWelcome, setShowWelcome] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -29,11 +39,7 @@ export function ClientWrapper({ accessToken }: ClientWrapperProps) {
   };
 
   if (isLoading) {
-    return (
-      <div className="grow flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (
@@ -42,4 +48,18 @@ export function ClientWrapper({ accessToken }: ClientWrapperProps) {
       {showWelcome && <WelcomeGuide onComplete={handleWelcomeComplete} />}
     </>
   );
+}
+
+export function ClientWrapper({ accessToken }: ClientWrapperProps) {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  if (!isAuthenticated) {
+    return <LandingPage />;
+  }
+
+  return <AuthenticatedApp accessToken={accessToken} />;
 }

@@ -1,15 +1,21 @@
-import { sessions, type Session, type InsertSession } from "../shared/schema";
+import { sessions, users, type Session, type InsertSession, type User, type UpsertUser } from "../shared/schema";
 import { db } from "./db";
 import { eq, desc } from "drizzle-orm";
 
 // Interface for storage operations
 export interface IStorage {
+  // Session operations
   saveSession(sessionData: Omit<InsertSession, 'id' | 'createdAt'>): Promise<Session>;
   getSessionHistory(): Promise<Session[]>;
   getSession(id: number): Promise<Session | undefined>;
   deleteSession(id: number): Promise<void>;
   exportSessionsAsCSV(): Promise<string>;
   exportSessionsAsJSON(): Promise<string>;
+  
+  // User operations (required for Replit Auth)
+  getUser(id: number): Promise<User | undefined>;
+  getUserByReplitId(replitUserId: string): Promise<User | undefined>;
+  upsertUser(user: UpsertUser): Promise<User>;
 }
 
 // Database storage implementation
@@ -72,6 +78,44 @@ export class DatabaseStorage implements IStorage {
   async exportSessionsAsJSON(): Promise<string> {
     const allSessions = await this.getSessionHistory();
     return JSON.stringify(allSessions, null, 2);
+  }
+
+  // User operations (required for Replit Auth)
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  async getUserByReplitId(replitUserId: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.replitUserId, replitUserId));
+    return user;
+  }
+
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    // For Replit Auth, we need to handle user creation/update based on replit_user_id
+    if (userData.replitUserId) {
+      const existingUser = await this.getUserByReplitId(userData.replitUserId);
+      
+      if (existingUser) {
+        // Update existing user
+        const [user] = await db
+          .update(users)
+          .set({
+            ...userData,
+            updatedAt: new Date(),
+          })
+          .where(eq(users.replitUserId, userData.replitUserId))
+          .returning();
+        return user;
+      }
+    }
+    
+    // Create new user
+    const [user] = await db
+      .insert(users)
+      .values(userData)
+      .returning();
+    return user;
   }
 }
 
