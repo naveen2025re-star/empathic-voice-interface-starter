@@ -32,6 +32,11 @@ export function saveSession(sessionData: Omit<SessionData, 'id' | 'timestamp'>):
     
     const updatedSessions = [newSession, ...sessions].slice(0, MAX_SESSIONS);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedSessions));
+    
+    // Dispatch event to refresh achievements
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('session-saved'));
+    }
   } catch (error) {
     console.error('Error saving session:', error);
   }

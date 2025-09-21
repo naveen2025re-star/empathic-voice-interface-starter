@@ -19,104 +19,154 @@ interface Achievement {
   category: 'practice' | 'performance' | 'consistency' | 'improvement';
 }
 
+// Pure function to calculate achievements with consistent 0-100 scale
+const calculateAchievements = (sessions: any[]): Achievement[] => {
+  const totalSessions = sessions.length;
+  const averageScore = sessions.length > 0 ? 
+    sessions.reduce((sum, s) => sum + (s.averageMetrics.overall_score * 100), 0) / sessions.length : 0;
+  const bestScore = sessions.length > 0 ? 
+    Math.max(...sessions.map(s => s.averageMetrics.overall_score * 100)) : 0;
+  
+  // Find longest consecutive streak with 70%+ score and current streak length
+  const findConsecutiveStreak = (sessions: any[], targetScore: number): { hasStreak: boolean, currentLength: number } => {
+    let maxStreak = 0;
+    let currentStreak = 0;
+    
+    // Process sessions in reverse order (most recent first) to find current streak
+    let currentStreakFromEnd = 0;
+    for (let i = sessions.length - 1; i >= 0; i--) {
+      if (sessions[i].averageMetrics.overall_score * 100 >= targetScore) {
+        currentStreakFromEnd++;
+      } else {
+        break;
+      }
+    }
+    
+    // Find max streak in entire history
+    sessions.forEach(s => {
+      if (s.averageMetrics.overall_score * 100 >= targetScore) {
+        currentStreak++;
+        maxStreak = Math.max(maxStreak, currentStreak);
+      } else {
+        currentStreak = 0;
+      }
+    });
+    
+    return { 
+      hasStreak: maxStreak >= 5, 
+      currentLength: Math.min(currentStreakFromEnd, 5) 
+    };
+  };
+  const streakResult = findConsecutiveStreak(sessions, 70);
+  
+  const recentSessions = sessions.slice(-5);
+  const improvementTrend = recentSessions.length >= 2 ? 
+    (recentSessions[recentSessions.length - 1].averageMetrics.overall_score * 100) - 
+    (recentSessions[0].averageMetrics.overall_score * 100) : 0;
+
+  return [
+    {
+      id: 'first_session',
+      title: 'Getting Started',
+      description: 'Complete your first practice session',
+      icon: Target,
+      requirement: 1,
+      current: totalSessions,
+      unlocked: totalSessions >= 1,
+      category: 'practice'
+    },
+    {
+      id: 'dedicated_learner',
+      title: 'Dedicated Learner',
+      description: 'Complete 5 practice sessions',
+      icon: Star,
+      requirement: 5,
+      current: totalSessions,
+      unlocked: totalSessions >= 5,
+      category: 'practice'
+    },
+    {
+      id: 'sales_pro',
+      title: 'Sales Professional',
+      description: 'Complete 20 practice sessions',
+      icon: Trophy,
+      requirement: 20,
+      current: totalSessions,
+      unlocked: totalSessions >= 20,
+      category: 'practice'
+    },
+    {
+      id: 'high_performer',
+      title: 'High Performer',
+      description: 'Achieve a score of 80% or higher',
+      icon: Award,
+      requirement: 80,
+      current: Math.round(bestScore),
+      unlocked: bestScore >= 80,
+      category: 'performance'
+    },
+    {
+      id: 'consistent_closer',
+      title: 'Consistent Closer',
+      description: 'Score 70%+ in 5 consecutive sessions',
+      icon: TrendingUp,
+      requirement: 5,
+      current: streakResult.currentLength,
+      unlocked: streakResult.hasStreak,
+      category: 'consistency'
+    },
+    {
+      id: 'improvement_master',
+      title: 'Improvement Master',
+      description: 'Improve by 20+ points in recent sessions',
+      icon: Zap,
+      requirement: 20,
+      current: Math.max(0, Math.round(improvementTrend)),
+      unlocked: improvementTrend >= 20,
+      category: 'improvement'
+    }
+  ];
+};
+
 export function AchievementSystem() {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [newUnlocks, setNewUnlocks] = useState<Achievement[]>([]);
 
-  useEffect(() => {
+  const updateAchievements = () => {
     const sessions = getSessionHistory();
-    const calculateAchievements = (): Achievement[] => {
-      const totalSessions = sessions.length;
-      const averageScore = sessions.length > 0 ? 
-        sessions.reduce((sum, s) => sum + s.averageMetrics.overall_score, 0) / sessions.length : 0;
-      const bestScore = sessions.length > 0 ? 
-        Math.max(...sessions.map(s => s.averageMetrics.overall_score)) : 0;
-      const consistentSessions = sessions.filter(s => s.averageMetrics.overall_score >= 70).length;
-      
-      const recentSessions = sessions.slice(-5);
-      const improvementTrend = recentSessions.length >= 2 ? 
-        recentSessions[recentSessions.length - 1].averageMetrics.overall_score - recentSessions[0].averageMetrics.overall_score : 0;
-
-      return [
-        {
-          id: 'first_session',
-          title: 'Getting Started',
-          description: 'Complete your first practice session',
-          icon: Target,
-          requirement: 1,
-          current: totalSessions,
-          unlocked: totalSessions >= 1,
-          category: 'practice'
-        },
-        {
-          id: 'dedicated_learner',
-          title: 'Dedicated Learner',
-          description: 'Complete 5 practice sessions',
-          icon: Star,
-          requirement: 5,
-          current: totalSessions,
-          unlocked: totalSessions >= 5,
-          category: 'practice'
-        },
-        {
-          id: 'sales_pro',
-          title: 'Sales Professional',
-          description: 'Complete 20 practice sessions',
-          icon: Trophy,
-          requirement: 20,
-          current: totalSessions,
-          unlocked: totalSessions >= 20,
-          category: 'practice'
-        },
-        {
-          id: 'high_performer',
-          title: 'High Performer',
-          description: 'Achieve a score of 80% or higher',
-          icon: Award,
-          requirement: 80,
-          current: Math.round(bestScore),
-          unlocked: bestScore >= 80,
-          category: 'performance'
-        },
-        {
-          id: 'consistent_closer',
-          title: 'Consistent Closer',
-          description: 'Score 70%+ in 5 consecutive sessions',
-          icon: TrendingUp,
-          requirement: 5,
-          current: consistentSessions,
-          unlocked: consistentSessions >= 5,
-          category: 'consistency'
-        },
-        {
-          id: 'improvement_master',
-          title: 'Improvement Master',
-          description: 'Improve by 20+ points in recent sessions',
-          icon: Zap,
-          requirement: 20,
-          current: Math.max(0, Math.round(improvementTrend)),
-          unlocked: improvementTrend >= 20,
-          category: 'improvement'
-        }
-      ];
-    };
-
-    const newAchievements = calculateAchievements();
+    const previouslyUnlocked = JSON.parse(localStorage.getItem('emoticlose_unlocked_achievements') || '[]');
+    
+    const newAchievements = calculateAchievements(sessions);
     
     // Check for new unlocks
-    const prevUnlocked = achievements.filter(a => a.unlocked).map(a => a.id);
     const currentUnlocked = newAchievements.filter(a => a.unlocked).map(a => a.id);
     const newlyUnlocked = newAchievements.filter(a => 
-      a.unlocked && !prevUnlocked.includes(a.id)
+      a.unlocked && !previouslyUnlocked.includes(a.id)
     );
     
     if (newlyUnlocked.length > 0) {
       setNewUnlocks(newlyUnlocked);
+      // Save updated unlocked achievements
+      localStorage.setItem('emoticlose_unlocked_achievements', JSON.stringify(currentUnlocked));
       // Auto-hide notification after 5 seconds
       setTimeout(() => setNewUnlocks([]), 5000);
     }
     
     setAchievements(newAchievements);
+  };
+  
+  useEffect(() => {
+    updateAchievements();
+  }, []);
+  
+  // Listen for session updates to refresh achievements
+  useEffect(() => {
+    const handleSessionSaved = () => {
+      updateAchievements();
+    };
+    
+    window.addEventListener('session-saved', handleSessionSaved);
+    return () => window.removeEventListener('session-saved', handleSessionSaved);
   }, []);
 
   const categoryColors = {

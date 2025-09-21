@@ -86,7 +86,7 @@ const SalesCoachingSession = ({
     const sessions = getSessionHistory();
     if (sessions.length > 0) {
       const lastSession = sessions[sessions.length - 1];
-      setRecentScore(lastSession.averageMetrics.overall_score);
+      setRecentScore(Math.round(lastSession.averageMetrics.overall_score * 100));
     }
   }, []);
   
@@ -94,8 +94,13 @@ const SalesCoachingSession = ({
   const [sessionStartTime, setSessionStartTime] = useState<number | null>(null);
   const [allMetrics, setAllMetrics] = useState<SalesMetricsType[]>([]);
   const [allFeedback, setAllFeedback] = useState<string[]>([]);
-  const [showSessionPrep, setShowSessionPrep] = useState(false);
   const [recentScore, setRecentScore] = useState<number | null>(null);
+  const [sessionReady, setSessionReady] = useState(false);
+  
+  // Reset session prep when script changes
+  useEffect(() => {
+    setSessionReady(false);
+  }, [selectedScript?.title]);
 
   // Get the latest user message emotions for coaching feedback
   const userMessages = messages?.filter(m => m.type === 'user_message') || [];
@@ -150,6 +155,8 @@ const SalesCoachingSession = ({
       }
       
       setSessionStartTime(null);
+      // Reset session prep for next session
+      setSessionReady(false);
     }
   }, [isConnected, sessionStartTime, selectedScript, allMetrics, allFeedback, userMessages.length]);
   
@@ -196,26 +203,23 @@ const SalesCoachingSession = ({
       </div>
       
       <Controls />
-      <StartCall 
-        configId={configId} 
-        accessToken={accessToken} 
-        selectedScript={selectedScript}
-        onBeforeStart={() => {
-          if (selectedScript) {
-            setShowSessionPrep(true);
-          }
-        }}
-      />
-      
-      {/* Session Preparation */}
-      {showSessionPrep && selectedScript && (
+      {/* Show session prep before allowing connection */}
+      {selectedScript && !sessionReady && !isConnected && (
         <SessionPrep
           scriptTitle={selectedScript.title}
           recentScore={recentScore}
           onStartSession={() => {
-            setShowSessionPrep(false);
-            // StartCall component will handle the actual connection
+            setSessionReady(true);
           }}
+        />
+      )}
+      
+      {/* Only show StartCall after session prep is complete and not connected */}
+      {sessionReady && !isConnected && (
+        <StartCall 
+          configId={configId} 
+          accessToken={accessToken} 
+          selectedScript={selectedScript}
         />
       )}
       
