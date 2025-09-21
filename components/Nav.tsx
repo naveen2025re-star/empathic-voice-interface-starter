@@ -3,9 +3,11 @@
 import { Button } from "./ui/button";
 import { Moon, Sun, TrendingUp, Target } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useRouter } from "next/navigation";
 
 export const Nav = () => {
   const { theme, setTheme } = useTheme();
+  const router = useRouter();
 
   return (
     <div
@@ -22,7 +24,7 @@ export const Nav = () => {
           variant={"ghost"}
           size={"sm"}
           className={"flex items-center gap-1.5 rounded-full"}
-          onClick={() => window.location.href = '/performance'}
+          onClick={() => router.push('/performance')}
         >
           <TrendingUp className={"size-4"} />
           <span className={"hidden sm:inline"}>Performance</span>

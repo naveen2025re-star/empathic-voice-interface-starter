@@ -3,10 +3,24 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ["hume"]
   },
+  // Optimize for faster builds and navigation
+  swcMinify: true,
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production",
+  },
   async headers() {
     return [
       {
-        source: '/(.*)',
+        source: '/performance',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=300, s-maxage=300'
+          }
+        ]
+      },
+      {
+        source: '/((?!performance).*)',
         headers: [
           {
             key: 'Cache-Control',
