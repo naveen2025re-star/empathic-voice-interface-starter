@@ -24,7 +24,7 @@ export interface User {
   createdAt: string;
 }
 
-export interface SessionPayload {
+export interface SessionPayload extends Record<string, unknown> {
   userId: number;
   email: string;
 }
@@ -61,7 +61,7 @@ export async function getSession(): Promise<SessionPayload | null> {
 
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET);
-    return payload as SessionPayload;
+    return payload as unknown as SessionPayload;
   } catch {
     return null;
   }
@@ -99,6 +99,37 @@ export async function getCurrentUser(): Promise<User | null> {
   };
 }
 
+async function generateUniqueUsername(email: string): Promise<string> {
+  // Extract base username from email (part before @)
+  const baseUsername = email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '');
+  
+  // Check if base username is available
+  let username = baseUsername;
+  let counter = 1;
+  
+  while (true) {
+    const existing = await sql`
+      SELECT id FROM users WHERE username = ${username}
+    `;
+    
+    if (existing.length === 0) {
+      return username;
+    }
+    
+    // Add number suffix if username exists
+    username = `${baseUsername}${counter}`;
+    counter++;
+    
+    // Prevent infinite loops
+    if (counter > 1000) {
+      username = `${baseUsername}${Date.now()}`;
+      break;
+    }
+  }
+  
+  return username;
+}
+
 export async function registerUser(data: { email: string; password: string; firstName?: string; lastName?: string }): Promise<User> {
   const validation = registerSchema.safeParse(data);
   if (!validation.success) {
@@ -116,13 +147,16 @@ export async function registerUser(data: { email: string; password: string; firs
     throw new Error('User already exists with this email');
   }
 
+  // Generate unique username from email
+  const username = await generateUniqueUsername(email);
+
   // Hash password
   const passwordHash = await bcrypt.hash(password, 12);
 
-  // Create user
+  // Create user with auto-generated username
   const result = await sql`
-    INSERT INTO users (email, password_hash, first_name, last_name)
-    VALUES (${email}, ${passwordHash}, ${firstName || null}, ${lastName || null})
+    INSERT INTO users (email, password_hash, first_name, last_name, username)
+    VALUES (${email}, ${passwordHash}, ${firstName || null}, ${lastName || null}, ${username})
     RETURNING id, email, first_name, last_name, username, created_at
   `;
 
