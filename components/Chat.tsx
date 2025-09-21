@@ -35,7 +35,7 @@ const CoachingFeedback = dynamic(() => import("./CoachingFeedback"), {
 import { AuthenticatedNav } from "./AuthenticatedNav";
 import { ComponentRef, useRef, useState, useEffect, useCallback, useMemo, memo } from "react";
 import { toast } from "sonner";
-import { calculateSalesMetrics, generateCoachingFeedback } from "@/utils/salesCoaching";
+import { calculateSalesMetrics, generateCoachingFeedback, type SalesScenario } from "@/utils/salesCoaching";
 import { saveSession, SessionData, getSessionHistory } from "@/utils/sessionStorage";
 import type { SalesMetrics as SalesMetricsType } from "@/utils/salesCoaching";
 const SessionPrep = dynamic(() => import("@/components/coaching/SessionPrep").then(mod => ({ default: mod.SessionPrep })), {
@@ -64,13 +64,13 @@ export default function ClientComponent({
 }) {
   const timeout = useRef<number | null>(null);
   const ref = useRef<HTMLDivElement | null>(null);
-  const [selectedScript, setSelectedScript] = useState<{script: string, title: string} | null>(null);
+  const [selectedScript, setSelectedScript] = useState<{script: string, title: string, scenario?: SalesScenario} | null>(null);
 
   // optional: use configId from environment variable
   const configId = process.env['NEXT_PUBLIC_HUME_CONFIG_ID'];
   
-  const handleScriptSelect = useCallback((script: string, title: string) => {
-    setSelectedScript({ script, title });
+  const handleScriptSelect = useCallback((script: string, title: string, scenario?: SalesScenario) => {
+    setSelectedScript({ script, title, scenario });
   }, []);
 
   return (
@@ -118,8 +118,8 @@ const SalesCoachingSession = ({
   accessToken,
   messagesRef
 }: {
-  selectedScript: {script: string, title: string} | null;
-  onScriptSelect: (script: string, title: string) => void;
+  selectedScript: {script: string, title: string, scenario?: SalesScenario} | null;
+  onScriptSelect: (script: string, title: string, scenario?: SalesScenario) => void;
   configId?: string;
   accessToken: string;
   messagesRef: React.RefObject<HTMLDivElement>;
