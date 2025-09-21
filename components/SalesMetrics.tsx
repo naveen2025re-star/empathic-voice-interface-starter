@@ -3,7 +3,7 @@ import { calculateSalesMetrics, SalesMetrics as ISalesMetrics, CoachingFeedback 
 import { motion } from "framer-motion";
 import { CSSProperties, memo, useMemo } from "react";
 import { TrendingUp, TrendingDown, Zap, Heart, Shield, Target } from "lucide-react";
-import { CoachingTipsPanel } from "./CoachingFeedback";
+import CoachingTipsPanel from "./CoachingTipsPanel";
 
 interface SalesMetricsProps {
   values: Record<string, number>;
