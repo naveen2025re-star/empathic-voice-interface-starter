@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "next dev --turbo --hostname 0.0.0.0 --port 5000",
     "dev:fast": "NEXT_PRIVATE_LOCAL_WEBPACK=1 next dev --turbo --hostname 0.0.0.0 --port 5000",
+    "dev:profile": "NODE_OPTIONS='--inspect' next dev --turbo --hostname 0.0.0.0 --port 5000",
     "build": "next build",
+    "analyze": "ANALYZE=true npm run build",
     "start": "next start",
     "lint": "next lint",
     "db:push": "drizzle-kit push",

@@ -5,15 +5,28 @@ import Messages from "./Messages";
 import Controls from "./Controls";
 import StartCall from "./StartCall";
 import SalesScriptSelector from "./SalesScriptSelector";
-import SalesMetrics from "./SalesMetrics";
-import CoachingFeedback from "./CoachingFeedback";
+import dynamic from "next/dynamic";
+
+// Dynamic imports for code splitting
+const SalesMetrics = dynamic(() => import("./SalesMetrics"), {
+  loading: () => <div className="w-80 border-l bg-muted/20 animate-pulse" />,
+  ssr: false
+});
+
+const CoachingFeedback = dynamic(() => import("./CoachingFeedback"), {
+  loading: () => <div className="h-4 bg-muted animate-pulse rounded" />,
+  ssr: false
+});
 import { AuthenticatedNav } from "./AuthenticatedNav";
 import { ComponentRef, useRef, useState, useEffect } from "react";
 import { toast } from "sonner";
 import { calculateSalesMetrics, generateCoachingFeedback } from "@/utils/salesCoaching";
 import { saveSession, SessionData, getSessionHistory } from "@/utils/sessionStorage";
 import type { SalesMetrics as SalesMetricsType } from "@/utils/salesCoaching";
-import { SessionPrep } from "@/components/coaching/SessionPrep";
+const SessionPrep = dynamic(() => import("@/components/coaching/SessionPrep").then(mod => ({ default: mod.SessionPrep })), {
+  loading: () => <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center"><div className="w-full max-w-2xl bg-card rounded-lg animate-pulse h-96" /></div>,
+  ssr: false
+});
 
 export default function ClientComponent({
   accessToken,
@@ -21,7 +34,7 @@ export default function ClientComponent({
   accessToken: string;
 }) {
   const timeout = useRef<number | null>(null);
-  const ref = useRef<ComponentRef<typeof Messages> | null>(null);
+  const ref = useRef<HTMLDivElement | null>(null);
   const [selectedScript, setSelectedScript] = useState<{script: string, title: string} | null>(null);
 
   // optional: use configId from environment variable
@@ -80,7 +93,7 @@ const SalesCoachingSession = ({
   onScriptSelect: (script: string, title: string) => void;
   configId?: string;
   accessToken: string;
-  messagesRef: ComponentRef<typeof Messages> | null;
+  messagesRef: React.RefObject<HTMLDivElement>;
 }) => {
   const { status, fft, messages } = useVoice();
   const isConnected = status.value === "connected";
@@ -222,7 +235,7 @@ const SalesCoachingSession = ({
       {selectedScript && !sessionReady && !isConnected && (
         <SessionPrep
           scriptTitle={selectedScript.title}
-          recentScore={recentScore}
+          recentScore={recentScore ?? undefined}
           onStartSession={() => {
             setSessionReady(true);
           }}

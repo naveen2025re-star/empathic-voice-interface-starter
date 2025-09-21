@@ -132,8 +132,8 @@ export function AchievementSystem() {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [newUnlocks, setNewUnlocks] = useState<Achievement[]>([]);
 
-  const updateAchievements = () => {
-    const sessions = getSessionHistory();
+  const updateAchievements = async () => {
+    const sessions = await getSessionHistory();
     const previouslyUnlocked = JSON.parse(localStorage.getItem('emoticlose_unlocked_achievements') || '[]');
     
     const newAchievements = calculateAchievements(sessions);
