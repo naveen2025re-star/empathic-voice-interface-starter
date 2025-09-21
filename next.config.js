@@ -20,6 +20,14 @@ const nextConfig = {
     webVitalsAttribution: ['CLS', 'LCP'],
     // Speed up bundling
     serverMinification: false,
+    // Reduce memory usage and speed up builds
+    staleTimes: {
+      dynamic: 30,
+      static: 180,
+    },
+    // Optimize for performance
+    optimizeServerReact: true,
+    // Additional performance optimizations enabled
   },
   // Optimize for faster builds
   swcMinify: true,
