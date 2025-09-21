@@ -1,6 +1,6 @@
 "use client";
 import { generateCoachingFeedback, CoachingFeedback as ICoachingFeedback } from "@/utils/salesCoaching";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle, AlertTriangle, TrendingUp, Lightbulb } from "lucide-react";
 import { useState, useEffect } from "react";
 

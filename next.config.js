@@ -1,13 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    serverComponentsExternalPackages: ["hume"]
+    serverComponentsExternalPackages: ["hume"],
+    // Optimize bundling for faster compilation
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-slot', 'framer-motion'],
+    // Fast compilation
+    typedRoutes: false,
+    // Faster builds
+    webVitalsAttribution: ['CLS', 'LCP'],
   },
-  // Optimize for faster builds and navigation
+  // Optimize for faster builds
   swcMinify: true,
-  compiler: {
-    removeConsole: process.env.NODE_ENV === "production",
-  },
   async headers() {
     return [
       {
@@ -35,12 +38,6 @@ const nextConfig = {
     return [];
   },
   // Configure for development in Replit environment
-  ...(process.env.NODE_ENV === 'development' && {
-    experimental: {
-      ...this?.experimental,
-      allowedRevalidateHeaderKeys: ['host'],
-    }
-  })
 };
 
 module.exports = nextConfig;

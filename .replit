@@ -17,27 +17,23 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Next.js Dev Server"
+args = "Fast Next.js Server"
 
 [[workflows.workflow]]
-name = "Next.js Dev Server"
+name = "Fast Next.js Server"
 author = "agent"
-
-[workflows.workflow.metadata]
-outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run dev"
 waitForPort = 5000
 
+[workflows.workflow.metadata]
+outputType = "webview"
+
 [[ports]]
 localPort = 5000
 externalPort = 80
-
-[[ports]]
-localPort = 36879
-externalPort = 3000
 
 [deployment]
 deploymentTarget = "autoscale"

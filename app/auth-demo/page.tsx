@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, ArrowRight } from "lucide-react";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 
 export default function AuthDemo() {
   const [isSigningIn, setIsSigningIn] = useState(false);

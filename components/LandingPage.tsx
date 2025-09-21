@@ -3,7 +3,7 @@
 import { ArrowRight, Mic, Brain, TrendingUp, Users, CheckCircle, Star } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 
 export function LandingPage() {
   return (

@@ -1,6 +1,6 @@
 "use client";
 import { calculateSalesMetrics, SalesMetrics as ISalesMetrics } from "@/utils/salesCoaching";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { CSSProperties } from "react";
 import { TrendingUp, TrendingDown, Zap, Heart, Shield, Target } from "lucide-react";
 
