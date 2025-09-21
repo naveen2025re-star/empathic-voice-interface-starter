@@ -19,13 +19,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={cn(
           GeistSans.variable,
           GeistMono.variable,
           "flex flex-col min-h-screen"
         )}
+        suppressHydrationWarning
       >
         <QueryProvider>
           <ThemeProvider
