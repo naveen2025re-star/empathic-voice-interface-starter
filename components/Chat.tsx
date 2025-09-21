@@ -83,11 +83,18 @@ const SalesCoachingSession = ({
   
   // Get recent performance for personalized prep
   useEffect(() => {
-    const sessions = getSessionHistory();
-    if (sessions.length > 0) {
-      const lastSession = sessions[sessions.length - 1];
-      setRecentScore(Math.round(lastSession.averageMetrics.overall_score * 100));
-    }
+    const loadRecentScore = async () => {
+      try {
+        const sessions = await getSessionHistory();
+        if (sessions.length > 0) {
+          const lastSession = sessions[sessions.length - 1];
+          setRecentScore(Math.round(lastSession.averageMetrics.overall_score * 100));
+        }
+      } catch (error) {
+        console.error('Error loading recent score:', error);
+      }
+    };
+    loadRecentScore();
   }, []);
   
   // Session tracking state
@@ -115,9 +122,10 @@ const SalesCoachingSession = ({
       setAllFeedback([]);
     } else if (!isConnected && sessionStartTime && selectedScript) {
       // Session ended, save the data
-      const sessionDuration = Date.now() - sessionStartTime;
+      const handleSessionEnd = async () => {
+        const sessionDuration = Date.now() - sessionStartTime;
       
-      if (allMetrics.length > 0 && sessionDuration > 10000) { // Only save sessions longer than 10 seconds
+        if (allMetrics.length > 0 && sessionDuration > 10000) { // Only save sessions longer than 10 seconds
         const averageMetrics = {
           confidence: allMetrics.reduce((sum, m) => sum + m.confidence, 0) / allMetrics.length,
           enthusiasm: allMetrics.reduce((sum, m) => sum + m.enthusiasm, 0) / allMetrics.length,
@@ -138,7 +146,7 @@ const SalesCoachingSession = ({
           strengths: allFeedback.filter(f => f.includes('Great') || f.includes('Excellent')).slice(0, 3)
         };
         
-        saveSession({
+        await saveSession({
           duration: sessionDuration,
           scriptTitle: selectedScript.title,
           scriptContent: selectedScript.script,
@@ -152,11 +160,14 @@ const SalesCoachingSession = ({
           description: `Score: ${Math.round(averageMetrics.overall_score)}% | ${userMessages.length} interactions`,
           duration: 4000
         });
-      }
+        }
+        
+        setSessionStartTime(null);
+        // Reset session prep for next session
+        setSessionReady(false);
+      };
       
-      setSessionStartTime(null);
-      // Reset session prep for next session
-      setSessionReady(false);
+      handleSessionEnd();
     }
   }, [isConnected, sessionStartTime, selectedScript, allMetrics, allFeedback, userMessages.length]);
   

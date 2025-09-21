@@ -29,31 +29,39 @@ export default function PerformancePage() {
   const [averageMetrics, setAverageMetrics] = useState<SalesMetrics | null>(null);
 
   useEffect(() => {
-    const sessionHistory = getSessionHistory();
-    setSessions(sessionHistory);
-    
-    if (sessionHistory.length > 0) {
-      // Calculate average metrics across all sessions
-      const totalMetrics = sessionHistory.reduce((acc, session) => {
-        return {
-          confidence: acc.confidence + session.averageMetrics.confidence,
-          enthusiasm: acc.enthusiasm + session.averageMetrics.enthusiasm,
-          persuasiveness: acc.persuasiveness + session.averageMetrics.persuasiveness,
-          authenticity: acc.authenticity + session.averageMetrics.authenticity,
-          nervousness: acc.nervousness + session.averageMetrics.nervousness,
-          overall_score: acc.overall_score + session.averageMetrics.overall_score
-        };
-      }, { confidence: 0, enthusiasm: 0, persuasiveness: 0, authenticity: 0, nervousness: 0, overall_score: 0 });
+    const loadSessions = async () => {
+      try {
+        const sessionHistory = await getSessionHistory();
+        setSessions(sessionHistory);
+        
+        if (sessionHistory.length > 0) {
+          // Calculate average metrics across all sessions
+          const totalMetrics = sessionHistory.reduce((acc, session) => {
+            return {
+              confidence: acc.confidence + session.averageMetrics.confidence,
+              enthusiasm: acc.enthusiasm + session.averageMetrics.enthusiasm,
+              persuasiveness: acc.persuasiveness + session.averageMetrics.persuasiveness,
+              authenticity: acc.authenticity + session.averageMetrics.authenticity,
+              nervousness: acc.nervousness + session.averageMetrics.nervousness,
+              overall_score: acc.overall_score + session.averageMetrics.overall_score
+            };
+          }, { confidence: 0, enthusiasm: 0, persuasiveness: 0, authenticity: 0, nervousness: 0, overall_score: 0 });
 
-      setAverageMetrics({
-        confidence: totalMetrics.confidence / sessionHistory.length,
-        enthusiasm: totalMetrics.enthusiasm / sessionHistory.length,
-        persuasiveness: totalMetrics.persuasiveness / sessionHistory.length,
-        authenticity: totalMetrics.authenticity / sessionHistory.length,
-        nervousness: totalMetrics.nervousness / sessionHistory.length,
-        overall_score: totalMetrics.overall_score / sessionHistory.length
-      });
-    }
+          setAverageMetrics({
+            confidence: totalMetrics.confidence / sessionHistory.length,
+            enthusiasm: totalMetrics.enthusiasm / sessionHistory.length,
+            persuasiveness: totalMetrics.persuasiveness / sessionHistory.length,
+            authenticity: totalMetrics.authenticity / sessionHistory.length,
+            nervousness: totalMetrics.nervousness / sessionHistory.length,
+            overall_score: totalMetrics.overall_score / sessionHistory.length
+          });
+        }
+      } catch (error) {
+        console.error('Error loading sessions:', error);
+      }
+    };
+    
+    loadSessions();
   }, []);
 
   const formatDate = (timestamp: number) => {
@@ -71,36 +79,62 @@ export default function PerformancePage() {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
-  const handleExportJSON = () => {
-    const jsonData = exportSessionsAsJSON();
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(jsonData);
-    const downloadAnchorNode = document.createElement('a');
-    downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", `emoticlose-sessions-${new Date().toISOString().split('T')[0]}.json`);
-    document.body.appendChild(downloadAnchorNode);
-    downloadAnchorNode.click();
-    downloadAnchorNode.remove();
-    toast.success("Session data exported as JSON!");
+  const handleExportJSON = async () => {
+    try {
+      const jsonData = await exportSessionsAsJSON();
+      if (!jsonData) {
+        toast.error("No sessions to export");
+        return;
+      }
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(jsonData);
+      const downloadAnchorNode = document.createElement('a');
+      downloadAnchorNode.setAttribute("href", dataStr);
+      downloadAnchorNode.setAttribute("download", `emoticlose-sessions-${new Date().toISOString().split('T')[0]}.json`);
+      document.body.appendChild(downloadAnchorNode);
+      downloadAnchorNode.click();
+      downloadAnchorNode.remove();
+      toast.success("Session data exported as JSON!");
+    } catch (error) {
+      console.error('Error exporting JSON:', error);
+      toast.error("Failed to export session data");
+    }
   };
 
-  const handleExportCSV = () => {
-    const csvData = exportSessionsAsCSV();
-    if (!csvData) {
-      toast.error("No sessions to export");
-      return;
+  const handleExportCSV = async () => {
+    try {
+      const csvData = await exportSessionsAsCSV();
+      if (!csvData) {
+        toast.error("No sessions to export");
+        return;
+      }
+      const dataStr = "data:text/csv;charset=utf-8," + encodeURIComponent(csvData);
+      const downloadAnchorNode = document.createElement('a');
+      downloadAnchorNode.setAttribute("href", dataStr);
+      downloadAnchorNode.setAttribute("download", `emoticlose-sessions-${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(downloadAnchorNode);
+      downloadAnchorNode.click();
+      downloadAnchorNode.remove();
+      toast.success("Session data exported as CSV!");
+    } catch (error) {
+      console.error('Error exporting CSV:', error);
+      toast.error("Failed to export session data");
     }
-    const dataStr = "data:text/csv;charset=utf-8," + encodeURIComponent(csvData);
-    const downloadAnchorNode = document.createElement('a');
-    downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", `emoticlose-sessions-${new Date().toISOString().split('T')[0]}.csv`);
-    document.body.appendChild(downloadAnchorNode);
-    downloadAnchorNode.click();
-    downloadAnchorNode.remove();
-    toast.success("Session data exported as CSV!");
   };
 
   // Performance trends for visualization
-  const overallTrend = getPerformanceTrend('overall_score', 7);
+  const [overallTrend, setOverallTrend] = useState<number[]>([]);
+
+  useEffect(() => {
+    const loadTrend = async () => {
+      try {
+        const trend = await getPerformanceTrend('overall_score', 7);
+        setOverallTrend(trend);
+      } catch (error) {
+        console.error('Error loading performance trend:', error);
+      }
+    };
+    loadTrend();
+  }, [sessions]);
   
   const renderMiniChart = (values: number[], color: string = 'bg-primary') => {
     if (values.length === 0) return null;
