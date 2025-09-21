@@ -14,7 +14,22 @@ const SalesMetrics = dynamic(() => import("./SalesMetrics"), {
 });
 
 const CoachingFeedback = dynamic(() => import("./CoachingFeedback"), {
-  loading: () => <div className="h-4 bg-muted animate-pulse rounded" />,
+  loading: () => (
+    <div className="fixed bottom-20 left-4 right-4 max-w-md mx-auto z-40">
+      <div className="bg-background/95 backdrop-blur-sm border rounded-lg shadow-lg animate-pulse">
+        <div className="p-3 border-b bg-primary/5">
+          <div className="flex items-center gap-2">
+            <div className="size-4 bg-muted rounded" />
+            <div className="h-4 w-20 bg-muted rounded" />
+          </div>
+        </div>
+        <div className="p-3 space-y-2">
+          <div className="h-4 bg-muted rounded w-full" />
+          <div className="h-4 bg-muted rounded w-3/4" />
+        </div>
+      </div>
+    </div>
+  ),
   ssr: false
 });
 import { AuthenticatedNav } from "./AuthenticatedNav";
@@ -24,7 +39,21 @@ import { calculateSalesMetrics, generateCoachingFeedback } from "@/utils/salesCo
 import { saveSession, SessionData, getSessionHistory } from "@/utils/sessionStorage";
 import type { SalesMetrics as SalesMetricsType } from "@/utils/salesCoaching";
 const SessionPrep = dynamic(() => import("@/components/coaching/SessionPrep").then(mod => ({ default: mod.SessionPrep })), {
-  loading: () => <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center"><div className="w-full max-w-2xl bg-card rounded-lg animate-pulse h-96" /></div>,
+  loading: () => (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+      <div className="w-full max-w-2xl bg-card rounded-lg p-6 animate-pulse">
+        <div className="space-y-4">
+          <div className="h-6 bg-muted rounded w-1/2" />
+          <div className="h-4 bg-muted rounded w-full" />
+          <div className="h-4 bg-muted rounded w-3/4" />
+          <div className="flex gap-2 mt-6">
+            <div className="h-10 bg-muted rounded flex-1" />
+            <div className="h-10 bg-muted rounded flex-1" />
+          </div>
+        </div>
+      </div>
+    </div>
+  ),
   ssr: false
 });
 

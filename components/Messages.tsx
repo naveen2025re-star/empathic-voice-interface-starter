@@ -34,7 +34,7 @@ const Messages = forwardRef<
       >
         <AnimatePresence mode={"popLayout"}>
           {filteredMessages.map((msg, index) => (
-                <motion.div
+            <motion.div
                   key={`${msg.type}-${index}`}
                   className={cn(
                     "w-[80%]",
@@ -87,7 +87,7 @@ const Messages = forwardRef<
                   <div className={"pb-3 px-3"}>{msg.message.content}</div>
                   <Expressions values={{ ...msg.models.prosody?.scores }} />
                 </motion.div>
-              ))
+              ))}
         </AnimatePresence>
       </motion.div>
     </motion.div>
