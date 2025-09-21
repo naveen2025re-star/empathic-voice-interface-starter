@@ -1,91 +1,175 @@
-import { Request, Response, NextFunction } from 'express';
+import { neon } from '@neondatabase/serverless';
 import bcrypt from 'bcryptjs';
-import session from 'express-session';
-import connectPg from 'connect-pg-simple';
-import { storage } from './storage';
+import { loginSchema, registerSchema } from '@/shared/validation';
+import { cookies } from 'next/headers';
+import { SignJWT, jwtVerify } from 'jose';
 
-// Session configuration for email auth
-export function getSession() {
-  const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
-  const pgStore = connectPg(session);
-  const sessionStore = new pgStore({
-    conString: process.env.DATABASE_URL,
-    createTableIfMissing: true,
-    ttl: sessionTtl,
-    tableName: "auth_sessions",
-  });
+const sql = neon(process.env.DATABASE_URL!);
+
+// Require JWT_SECRET in production
+if (!process.env.JWT_SECRET && process.env.NODE_ENV === 'production') {
+  throw new Error('JWT_SECRET environment variable is required in production');
+}
+
+const JWT_SECRET = new TextEncoder().encode(
+  process.env.JWT_SECRET || 'dev-secret-key-only-for-development'
+);
+
+export interface User {
+  id: number;
+  email: string;
+  firstName: string | null;
+  lastName: string | null;
+  username: string | null;
+  createdAt: string;
+}
+
+export interface SessionPayload {
+  userId: number;
+  email: string;
+}
+
+export async function createSession(userId: number, email: string): Promise<string> {
+  const payload: SessionPayload = { userId, email };
   
-  return session({
-    secret: process.env.SESSION_SECRET || 'your-secret-key-change-in-production',
-    store: sessionStore,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: sessionTtl,
-    },
+  const token = await new SignJWT(payload)
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('7d')
+    .sign(JWT_SECRET);
+
+  // Set secure HTTP-only cookie
+  const cookieStore = cookies();
+  cookieStore.set('session', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 60 * 60 * 24 * 7, // 7 days
+    path: '/',
   });
+
+  return token;
 }
 
-// Authentication middleware
-export function isAuthenticated(req: Request, res: Response, next: NextFunction) {
-  if (req.session && (req.session as any).userId) {
-    return next();
+export async function getSession(): Promise<SessionPayload | null> {
+  const cookieStore = cookies();
+  const token = cookieStore.get('session')?.value;
+
+  if (!token) {
+    return null;
   }
-  return res.status(401).json({ message: 'Unauthorized' });
+
+  try {
+    const { payload } = await jwtVerify(token, JWT_SECRET);
+    return payload as SessionPayload;
+  } catch {
+    return null;
+  }
 }
 
-// Auth utility functions
-export async function hashPassword(password: string): Promise<string> {
-  const saltRounds = 12;
-  return bcrypt.hash(password, saltRounds);
+export async function destroySession(): Promise<void> {
+  const cookieStore = cookies();
+  cookieStore.delete('session');
 }
 
-export async function verifyPassword(password: string, hash: string): Promise<boolean> {
-  return bcrypt.compare(password, hash);
+export async function getCurrentUser(): Promise<User | null> {
+  const session = await getSession();
+  if (!session) {
+    return null;
+  }
+
+  const result = await sql`
+    SELECT id, email, first_name, last_name, username, created_at
+    FROM users 
+    WHERE id = ${session.userId}
+  `;
+
+  if (result.length === 0) {
+    return null;
+  }
+
+  const user = result[0];
+  return {
+    id: user.id,
+    email: user.email,
+    firstName: user.first_name,
+    lastName: user.last_name,
+    username: user.username,
+    createdAt: user.created_at,
+  };
 }
 
-// Register user
-export async function registerUser(email: string, password: string, firstName?: string, lastName?: string) {
+export async function registerUser(data: { email: string; password: string; firstName?: string; lastName?: string }): Promise<User> {
+  const validation = registerSchema.safeParse(data);
+  if (!validation.success) {
+    throw new Error('Invalid input data');
+  }
+
+  const { email, password, firstName, lastName } = validation.data;
+
   // Check if user already exists
-  const existingUser = await storage.getUserByEmail(email);
-  if (existingUser) {
-    throw new Error('User already exists');
+  const existingUser = await sql`
+    SELECT id FROM users WHERE email = ${email}
+  `;
+
+  if (existingUser.length > 0) {
+    throw new Error('User already exists with this email');
   }
 
   // Hash password
-  const passwordHash = await hashPassword(password);
-
-  // Create username from email (fallback)
-  const username = email.split('@')[0] + '_' + Date.now();
+  const passwordHash = await bcrypt.hash(password, 12);
 
   // Create user
-  const user = await storage.createUser({
-    email,
-    passwordHash,
-    username,
-    firstName: firstName || null,
-    lastName: lastName || null,
-    profileImageUrl: null,
-  });
+  const result = await sql`
+    INSERT INTO users (email, password_hash, first_name, last_name)
+    VALUES (${email}, ${passwordHash}, ${firstName || null}, ${lastName || null})
+    RETURNING id, email, first_name, last_name, username, created_at
+  `;
 
-  return user;
+  const user = result[0];
+  return {
+    id: user.id,
+    email: user.email,
+    firstName: user.first_name,
+    lastName: user.last_name,
+    username: user.username,
+    createdAt: user.created_at,
+  };
 }
 
-// Login user
-export async function loginUser(email: string, password: string) {
-  // Find user by email
-  const user = await storage.getUserByEmail(email);
-  if (!user) {
-    throw new Error('Invalid credentials');
+export async function loginUser(data: { email: string; password: string }): Promise<User> {
+  const validation = loginSchema.safeParse(data);
+  if (!validation.success) {
+    throw new Error('Invalid input data');
   }
+
+  const { email, password } = validation.data;
+
+  // Get user by email
+  const result = await sql`
+    SELECT id, email, password_hash, first_name, last_name, username, created_at
+    FROM users 
+    WHERE email = ${email}
+  `;
+
+  if (result.length === 0) {
+    throw new Error('Invalid email or password');
+  }
+
+  const user = result[0];
 
   // Verify password
-  const isValid = await verifyPassword(password, user.passwordHash);
-  if (!isValid) {
-    throw new Error('Invalid credentials');
+  const isValidPassword = await bcrypt.compare(password, user.password_hash);
+  if (!isValidPassword) {
+    throw new Error('Invalid email or password');
   }
 
-  return user;
+  return {
+    id: user.id,
+    email: user.email,
+    firstName: user.first_name,
+    lastName: user.last_name,
+    username: user.username,
+    createdAt: user.created_at,
+  };
 }

@@ -28,6 +28,7 @@ export async function saveSession(sessionData: Omit<SessionData, 'id' | 'created
     const response = await fetch('/api/sessions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify(sessionData)
     });
     
@@ -68,7 +69,9 @@ export async function getSessionHistory(): Promise<SessionData[]> {
   
   try {
     // Try to fetch from database first
-    const response = await fetch('/api/sessions');
+    const response = await fetch('/api/sessions', {
+      credentials: 'include'
+    });
     if (response.ok) {
       const sessions = await response.json();
       return Array.isArray(sessions) ? sessions : [];
@@ -96,7 +99,9 @@ export async function getSessionById(id: number): Promise<SessionData | null> {
   if (typeof window === 'undefined') return null;
   
   try {
-    const response = await fetch(`/api/sessions/${id}`);
+    const response = await fetch(`/api/sessions/${id}`, {
+      credentials: 'include'
+    });
     if (response.ok) {
       return await response.json();
     }
@@ -120,7 +125,10 @@ export async function deleteSession(id: number): Promise<void> {
   if (typeof window === 'undefined') return;
   
   try {
-    const response = await fetch(`/api/sessions/${id}`, { method: 'DELETE' });
+    const response = await fetch(`/api/sessions/${id}`, { 
+      method: 'DELETE',
+      credentials: 'include'
+    });
     if (!response.ok) {
       throw new Error('Failed to delete from database');
     }
@@ -150,7 +158,9 @@ export function clearAllSessions(): void {
 
 export async function exportSessionsAsJSON(): Promise<string> {
   try {
-    const response = await fetch('/api/sessions/export?format=json');
+    const response = await fetch('/api/sessions/export?format=json', {
+      credentials: 'include'
+    });
     if (response.ok) {
       return await response.text();
     }
@@ -167,7 +177,9 @@ export async function exportSessionsAsJSON(): Promise<string> {
 
 export async function exportSessionsAsCSV(): Promise<string> {
   try {
-    const response = await fetch('/api/sessions/export?format=csv');
+    const response = await fetch('/api/sessions/export?format=csv', {
+      credentials: 'include'
+    });
     if (response.ok) {
       return await response.text();
     }

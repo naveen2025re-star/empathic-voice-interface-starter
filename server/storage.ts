@@ -6,11 +6,11 @@ import { eq, desc } from "drizzle-orm";
 export interface IStorage {
   // Session operations
   saveSession(sessionData: Omit<InsertSession, 'id' | 'createdAt'>): Promise<Session>;
-  getSessionHistory(): Promise<Session[]>;
+  getSessionHistory(userId?: number): Promise<Session[]>;
   getSession(id: number): Promise<Session | undefined>;
   deleteSession(id: number): Promise<void>;
-  exportSessionsAsCSV(): Promise<string>;
-  exportSessionsAsJSON(): Promise<string>;
+  exportSessionsAsCSV(userId: number): Promise<string>;
+  exportSessionsAsJSON(userId: number): Promise<string>;
   
   // User operations (email-based authentication)
   getUser(id: number): Promise<User | undefined>;
@@ -29,11 +29,19 @@ export class DatabaseStorage implements IStorage {
     return session;
   }
 
-  async getSessionHistory(): Promise<Session[]> {
-    return await db
-      .select()
-      .from(sessions)
-      .orderBy(desc(sessions.createdAt));
+  async getSessionHistory(userId?: number): Promise<Session[]> {
+    if (userId) {
+      return await db
+        .select()
+        .from(sessions)
+        .where(eq(sessions.userId, userId))
+        .orderBy(desc(sessions.createdAt));
+    } else {
+      return await db
+        .select()
+        .from(sessions)
+        .orderBy(desc(sessions.createdAt));
+    }
   }
 
   async getSession(id: number): Promise<Session | undefined> {
@@ -50,14 +58,14 @@ export class DatabaseStorage implements IStorage {
       .where(eq(sessions.id, id));
   }
 
-  async exportSessionsAsCSV(): Promise<string> {
-    const allSessions = await this.getSessionHistory();
-    if (allSessions.length === 0) return '';
+  async exportSessionsAsCSV(userId: number): Promise<string> {
+    const userSessions = await this.getSessionHistory(userId);
+    if (userSessions.length === 0) return '';
     
     const headers = ['Date', 'Script', 'Duration (min)', 'Messages', 'Overall Score', 'Confidence', 'Enthusiasm', 'Persuasiveness'];
     const csvRows = [headers.join(',')];
     
-    allSessions.forEach(session => {
+    userSessions.forEach(session => {
       const metrics = session.averageMetrics as any;
       const duration = Math.round(session.duration / 60000);
       const row = [
@@ -76,9 +84,9 @@ export class DatabaseStorage implements IStorage {
     return csvRows.join('\n');
   }
 
-  async exportSessionsAsJSON(): Promise<string> {
-    const allSessions = await this.getSessionHistory();
-    return JSON.stringify(allSessions, null, 2);
+  async exportSessionsAsJSON(userId: number): Promise<string> {
+    const userSessions = await this.getSessionHistory(userId);
+    return JSON.stringify(userSessions, null, 2);
   }
 
   // User operations (email-based authentication)

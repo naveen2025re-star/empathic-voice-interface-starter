@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { destroySession } from '@/server/auth';
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
-    // For Next.js API routes, we'll handle logout client-side
-    // In a full Express app, we'd destroy the session here
+    // Destroy session cookie
+    await destroySession();
     
     return NextResponse.json({
       message: 'Logout successful'

@@ -1,13 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { storage } from '../../../../server/storage';
+import { getCurrentUser } from '@/server/auth';
 
 export async function GET(request: NextRequest) {
   try {
+    // Check authentication
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+    
     const { searchParams } = new URL(request.url);
     const format = searchParams.get('format') || 'json';
     
     if (format === 'csv') {
-      const csvData = await storage.exportSessionsAsCSV();
+      const csvData = await storage.exportSessionsAsCSV(user.id);
       return new NextResponse(csvData, {
         headers: {
           'Content-Type': 'text/csv',
@@ -15,7 +22,7 @@ export async function GET(request: NextRequest) {
         }
       });
     } else {
-      const jsonData = await storage.exportSessionsAsJSON();
+      const jsonData = await storage.exportSessionsAsJSON(user.id);
       return new NextResponse(jsonData, {
         headers: {
           'Content-Type': 'application/json',

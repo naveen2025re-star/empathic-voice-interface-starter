@@ -1,14 +1,20 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-// Check for authenticated user in localStorage
+// Fetch authenticated user from server
 async function fetchUser() {
-  if (typeof window !== 'undefined') {
-    const authUser = localStorage.getItem('auth_user');
-    if (authUser) {
-      return JSON.parse(authUser);
+  const response = await fetch("/api/auth/user", {
+    method: "GET",
+    credentials: "include", // Include cookies
+  });
+  
+  if (!response.ok) {
+    if (response.status === 401) {
+      return null; // User not authenticated
     }
+    throw new Error(`Failed to fetch user: ${response.status}`);
   }
-  return null;
+  
+  return response.json();
 }
 
 // Login function
@@ -16,6 +22,7 @@ async function loginUser(email: string, password: string) {
   const response = await fetch("/api/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include", // Include cookies
     body: JSON.stringify({ email, password }),
   });
 
@@ -25,12 +32,6 @@ async function loginUser(email: string, password: string) {
   }
 
   const data = await response.json();
-  
-  // Store user in localStorage
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('auth_user', JSON.stringify(data.user));
-  }
-  
   return data.user;
 }
 
@@ -39,6 +40,7 @@ async function registerUser(email: string, password: string, firstName?: string,
   const response = await fetch("/api/auth/register", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include", // Include cookies
     body: JSON.stringify({ email, password, firstName, lastName }),
   });
 
@@ -48,23 +50,18 @@ async function registerUser(email: string, password: string, firstName?: string,
   }
 
   const data = await response.json();
-  
-  // Store user in localStorage
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('auth_user', JSON.stringify(data.user));
-  }
-  
   return data.user;
 }
 
 // Logout function
 async function logoutUser() {
-  // Call logout endpoint
-  await fetch("/api/auth/logout", { method: "POST" });
+  const response = await fetch("/api/auth/logout", { 
+    method: "POST",
+    credentials: "include", // Include cookies
+  });
   
-  // Remove user from localStorage
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem('auth_user');
+  if (!response.ok) {
+    throw new Error('Logout failed');
   }
 }
 

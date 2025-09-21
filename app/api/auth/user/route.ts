@@ -1,18 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { storage } from '../../../../server/storage';
+import { NextResponse } from 'next/server';
+import { getCurrentUser } from '@/server/auth';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    // For now, return unauthenticated until we set up the full auth server
-    // This will be updated when we implement the Express auth middleware
-    return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
+    const user = await getCurrentUser();
     
-    // TODO: Implement proper authentication check
-    // const user = await getAuthenticatedUser(request);
-    // if (!user) {
-    //   return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
-    // }
-    // return NextResponse.json(user);
+    if (!user) {
+      return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
+    }
+    
+    return NextResponse.json(user);
   } catch (error) {
     console.error('Error in auth check:', error);
     return NextResponse.json({ message: "Internal server error" }, { status: 500 });
