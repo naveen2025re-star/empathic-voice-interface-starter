@@ -10,8 +10,9 @@ import CoachingFeedback from "./CoachingFeedback";
 import { ComponentRef, useRef, useState, useEffect } from "react";
 import { toast } from "sonner";
 import { calculateSalesMetrics, generateCoachingFeedback } from "@/utils/salesCoaching";
-import { saveSession, SessionData } from "@/utils/sessionStorage";
+import { saveSession, SessionData, getSessionHistory } from "@/utils/sessionStorage";
 import type { SalesMetrics as SalesMetricsType } from "@/utils/salesCoaching";
+import { SessionPrep } from "@/components/coaching/SessionPrep";
 
 export default function ClientComponent({
   accessToken,
@@ -80,10 +81,21 @@ const SalesCoachingSession = ({
   const { status, fft, messages } = useVoice();
   const isConnected = status.value === "connected";
   
+  // Get recent performance for personalized prep
+  useEffect(() => {
+    const sessions = getSessionHistory();
+    if (sessions.length > 0) {
+      const lastSession = sessions[sessions.length - 1];
+      setRecentScore(lastSession.averageMetrics.overall_score);
+    }
+  }, []);
+  
   // Session tracking state
   const [sessionStartTime, setSessionStartTime] = useState<number | null>(null);
   const [allMetrics, setAllMetrics] = useState<SalesMetricsType[]>([]);
   const [allFeedback, setAllFeedback] = useState<string[]>([]);
+  const [showSessionPrep, setShowSessionPrep] = useState(false);
+  const [recentScore, setRecentScore] = useState<number | null>(null);
 
   // Get the latest user message emotions for coaching feedback
   const userMessages = messages?.filter(m => m.type === 'user_message') || [];
@@ -187,8 +199,25 @@ const SalesCoachingSession = ({
       <StartCall 
         configId={configId} 
         accessToken={accessToken} 
-        selectedScript={selectedScript} 
+        selectedScript={selectedScript}
+        onBeforeStart={() => {
+          if (selectedScript) {
+            setShowSessionPrep(true);
+          }
+        }}
       />
+      
+      {/* Session Preparation */}
+      {showSessionPrep && selectedScript && (
+        <SessionPrep
+          scriptTitle={selectedScript.title}
+          recentScore={recentScore}
+          onStartSession={() => {
+            setShowSessionPrep(false);
+            // StartCall component will handle the actual connection
+          }}
+        />
+      )}
       
       {/* Real-time coaching feedback */}
       <CoachingFeedback 

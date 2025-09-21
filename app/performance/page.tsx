@@ -19,6 +19,10 @@ const SessionsList = dynamic(() => import("@/components/performance/SessionsList
   loading: () => <Card className="h-96 animate-pulse bg-muted" />
 });
 
+const AchievementSystem = dynamic(() => import("@/components/achievements/AchievementSystem").then(mod => ({ default: mod.AchievementSystem })), {
+  loading: () => <Card className="h-64 animate-pulse bg-muted" />
+});
+
 export default function PerformancePage() {
   const router = useRouter();
   const [sessions, setSessions] = useState<SessionData[]>([]);
@@ -214,6 +218,9 @@ export default function PerformancePage() {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Achievements */}
+            <AchievementSystem />
 
             {/* Average Performance Metrics */}
             {averageMetrics && <PerformanceStats averageMetrics={averageMetrics} />}
