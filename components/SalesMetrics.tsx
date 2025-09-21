@@ -43,7 +43,7 @@ const metricConfig = {
   }
 };
 
-function SalesMetrics({ values, coachingTips = [] }: SalesMetricsProps) {
+function SalesMetrics({ values }: SalesMetricsProps) {
   // Memoize metrics calculation for performance
   const metrics = useMemo(() => calculateSalesMetrics(values), [values]);
   
@@ -129,10 +129,6 @@ function SalesMetrics({ values, coachingTips = [] }: SalesMetricsProps) {
           })}
         </div>
 
-        {/* Coaching Tips Section - now scrollable */}
-        <div className="border-t pt-4">
-          <CoachingTipsPanel tips={coachingTips} />
-        </div>
       </div>
     </div>
   );
