@@ -35,7 +35,16 @@ const CoachingFeedback = dynamic(() => import("./CoachingFeedback"), {
 import { AuthenticatedNav } from "./AuthenticatedNav";
 import { ComponentRef, useRef, useState, useEffect, useCallback, useMemo, memo } from "react";
 import { toast } from "sonner";
-import { calculateSalesMetrics, generateCoachingFeedback, type SalesScenario } from "@/utils/salesCoaching";
+import { 
+  calculateSalesMetrics, 
+  generateCoachingFeedback, 
+  generateScenarioCoachingFeedback,
+  generateScenarioPrompt,
+  buyerPersonas,
+  detectObjections,
+  calculateScenarioScore,
+  type SalesScenario 
+} from "@/utils/salesCoaching";
 import { saveSession, SessionData, getSessionHistory } from "@/utils/sessionStorage";
 import type { SalesMetrics as SalesMetricsType } from "@/utils/salesCoaching";
 const SessionPrep = dynamic(() => import("@/components/coaching/SessionPrep").then(mod => ({ default: mod.SessionPrep })), {
@@ -245,8 +254,14 @@ const SalesCoachingSession = ({
         const metrics = calculateSalesMetrics(emotionsData);
         setAllMetrics(prev => [...prev, metrics]);
         
-        // Collect coaching feedback
-        const feedback = generateCoachingFeedback(emotionsData);
+        // Collect scenario-aware coaching feedback
+        const transcript = messages?.map(m => {
+          if (m.type === 'user_message' && m.message?.content) {
+            return m.message.content;
+          }
+          return '';
+        }).filter(Boolean).join(' ') || '';
+        const feedback = generateScenarioCoachingFeedback(emotionsData, selectedScript?.scenario, transcript);
         const feedbackMessages = feedback.map(f => f.message);
         setAllFeedback(prev => [...prev, ...feedbackMessages]);
       }, 150); // Debounce for 150ms to prevent excessive updates

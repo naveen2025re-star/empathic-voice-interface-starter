@@ -359,3 +359,300 @@ export const objectionLibrary = {
     ]
   }
 };
+
+// Scenario-based AI agent configuration
+export const generateScenarioPrompt = (scenario: SalesScenario, persona: BuyerPersona): string => {
+  const difficultyAdjustments = {
+    beginner: {
+      assertiveness: "mild",
+      objectionFrequency: "occasional",
+      tolerance: "high - give multiple chances to recover",
+      encouragement: "very supportive and encouraging"
+    },
+    intermediate: {
+      assertiveness: "moderate", 
+      objectionFrequency: "regular",
+      tolerance: "medium - require competent responses",
+      encouragement: "balanced feedback with gentle corrections"
+    },
+    expert: {
+      assertiveness: "high",
+      objectionFrequency: "frequent and challenging", 
+      tolerance: "low - demand excellent performance",
+      encouragement: "tough but fair - highlight mistakes clearly"
+    }
+  };
+
+  const adjustment = difficultyAdjustments[scenario.difficulty];
+
+  return `You are role-playing as a ${persona.name} in a ${scenario.industry} sales scenario: "${scenario.title}".
+
+PERSONA CHARACTERISTICS:
+- Description: ${persona.description}
+- Traits: ${persona.traits.join(", ")}
+- Response Style: ${persona.responseStyle}
+
+SCENARIO CONTEXT:
+- Industry: ${scenario.industry.toUpperCase()}
+- Difficulty: ${scenario.difficulty.toUpperCase()}
+- Objectives for the salesperson: ${scenario.objectives.join(", ")}
+- Expected duration: ${scenario.estimatedDuration}
+
+YOUR BEHAVIOR INSTRUCTIONS:
+- Assertiveness Level: ${adjustment.assertiveness}
+- Objection Frequency: ${adjustment.objectionFrequency}
+- Tolerance for Weak Responses: ${adjustment.tolerance}
+- Encouragement Style: ${adjustment.encouragement}
+
+COMMON OBJECTIONS TO USE:
+${scenario.commonObjections.map(obj => `- "${obj}"`).join('\n')}
+
+PERSONA-SPECIFIC OBJECTIONS:
+${persona.objections.map(obj => `- "${obj}"`).join('\n')}
+
+ROLE-PLAY GUIDELINES:
+1. Stay in character as the ${persona.name} throughout the conversation
+2. Respond naturally based on the persona traits and response style
+3. Raise objections from the lists above at appropriate times based on difficulty level
+4. Challenge the salesperson according to the assertiveness level
+5. Be ${adjustment.tolerance.split(' - ')[0]} with responses that don't meet your standards
+6. Focus on the persona's key challenges: ${persona.challenges.join(", ")}
+7. End the conversation when you feel satisfied with the salesperson's approach or when time is appropriate
+
+Remember: You are testing the salesperson's ability to handle ${scenario.difficulty} level sales situations. ${adjustment.encouragement}.`;
+};
+
+// Generate scenario-specific coaching feedback
+export const generateScenarioCoachingFeedback = (
+  emotions: Record<string, number>, 
+  scenario?: SalesScenario,
+  transcript?: string
+): CoachingFeedback[] => {
+  const baseMetrics = calculateSalesMetrics(emotions);
+  const feedback: CoachingFeedback[] = [];
+
+  if (!scenario) {
+    return generateCoachingFeedback(emotions);
+  }
+
+  const persona = buyerPersonas[scenario.persona];
+  
+  // Scenario-aware confidence coaching
+  const confidenceTarget = scenario.successMetrics.confidence;
+  if (baseMetrics.confidence < confidenceTarget) {
+    const gap = confidenceTarget - baseMetrics.confidence;
+    if (gap > 0.3) {
+      feedback.push({
+        message: `For ${persona.name} scenarios, you need more authority. They respond to confidence and expertise. Try speaking with more conviction.`,
+        type: 'improvement',
+        category: 'confidence'
+      });
+    } else {
+      feedback.push({
+        message: `You're close to the confidence level needed for ${persona.name} scenarios. Project a bit more expertise.`,
+        type: 'warning',
+        category: 'confidence'
+      });
+    }
+  } else {
+    feedback.push({
+      message: `Perfect confidence level for ${persona.name}! They respond well to this level of authority.`,
+      type: 'positive',
+      category: 'confidence'
+    });
+  }
+
+  // Scenario-aware enthusiasm coaching
+  const enthusiasmTarget = scenario.successMetrics.enthusiasm;
+  if (baseMetrics.enthusiasm < enthusiasmTarget) {
+    const enthusiasmTip = scenario.difficulty === 'expert' 
+      ? `${persona.name} expects controlled enthusiasm. Show passion but maintain professionalism.`
+      : `Increase your energy! ${persona.name} responds well to genuine excitement about solutions.`;
+    
+    feedback.push({
+      message: enthusiasmTip,
+      type: 'improvement',
+      category: 'energy'
+    });
+  }
+
+  // Scenario-aware persuasiveness coaching
+  const persuasivenessTarget = scenario.successMetrics.persuasiveness;
+  if (baseMetrics.persuasiveness < persuasivenessTarget) {
+    const industryTip = getIndustrySpecificTip(scenario.industry, persona);
+    feedback.push({
+      message: industryTip,
+      type: 'improvement',
+      category: 'authenticity'
+    });
+  }
+
+  // AI coaching tips specific to scenario
+  if (scenario.aiCoachingTips.length > 0) {
+    const randomTip = scenario.aiCoachingTips[Math.floor(Math.random() * scenario.aiCoachingTips.length)];
+    feedback.push({
+      message: `💡 Scenario tip: ${randomTip}`,
+      type: 'positive',
+      category: 'delivery'
+    });
+  }
+
+  return feedback.length > 0 ? feedback : generateCoachingFeedback(emotions);
+};
+
+// Industry-specific coaching tips
+const getIndustrySpecificTip = (industry: string, persona: BuyerPersona): string => {
+  const industryTips = {
+    healthcare: {
+      skeptical: "In healthcare, prove ROI with patient outcome data and compliance certifications.",
+      technical: "Focus on HIPAA compliance, security protocols, and integration capabilities.",
+      budgetConscious: "Emphasize cost savings through efficiency gains and reduced manual work.",
+      friendly: "Build rapport by showing genuine understanding of healthcare challenges."
+    },
+    financial: {
+      skeptical: "Financial clients need concrete risk analysis and regulatory compliance proof.",
+      technical: "Discuss API security, data encryption, and compliance with financial regulations.",
+      budgetConscious: "Present clear ROI calculations and cost-benefit analysis.",
+      friendly: "Reference similar successful implementations in their peer institutions."
+    },
+    saas: {
+      skeptical: "SaaS buyers want proof of scalability and uptime guarantees.",
+      technical: "Deep-dive into architecture, integrations, and technical specifications.",
+      budgetConscious: "Compare total cost of ownership vs current solutions.",
+      friendly: "Share success stories from similar-sized companies in their space."
+    },
+    realestate: {
+      skeptical: "Real estate clients need market data and comparable analysis.",
+      technical: "Focus on CRM integrations and lead management capabilities.",
+      budgetConscious: "Show how the investment will increase transaction volume and commission.",
+      friendly: "Understand their specific market dynamics and client base."
+    }
+  };
+
+  return industryTips[industry as keyof typeof industryTips]?.[persona.id as keyof typeof industryTips.healthcare] 
+    || "Tailor your approach to address their specific industry challenges and persona traits.";
+};
+
+// Objection detection from transcript
+export const detectObjections = (transcript: string, scenario?: SalesScenario): {
+  detected: string[];
+  suggestions: string[];
+} => {
+  if (!transcript || !scenario) {
+    return { detected: [], suggestions: [] };
+  }
+
+  const detected: string[] = [];
+  const suggestions: string[] = [];
+  
+  const lowerTranscript = transcript.toLowerCase();
+  
+  // Check for common objections in the transcript
+  const allObjections = [...scenario.commonObjections, ...buyerPersonas[scenario.persona].objections];
+  
+  allObjections.forEach(objection => {
+    // Simple keyword matching for objection detection
+    const keywords = extractKeywords(objection);
+    if (keywords.some(keyword => lowerTranscript.includes(keyword.toLowerCase()))) {
+      detected.push(objection);
+      
+      // Find appropriate response from objection library
+      const response = findObjectionResponse(objection);
+      if (response) {
+        suggestions.push(response);
+      }
+    }
+  });
+
+  return { detected, suggestions };
+};
+
+// Extract keywords from objection for detection
+const extractKeywords = (objection: string): string[] => {
+  // Remove common words and extract meaningful keywords
+  const commonWords = ['the', 'a', 'an', 'is', 'are', 'we', 'our', 'your', 'it', 'this', 'that'];
+  return objection
+    .toLowerCase()
+    .replace(/[^\w\s]/g, '')
+    .split(' ')
+    .filter(word => word.length > 2 && !commonWords.includes(word));
+};
+
+// Find appropriate response from objection library
+const findObjectionResponse = (objection: string): string | null => {
+  const lowerObjection = objection.toLowerCase();
+  
+  for (const [category, objections] of Object.entries(objectionLibrary)) {
+    for (const [key, responses] of Object.entries(objections)) {
+      if (lowerObjection.includes(key.toLowerCase().split(' ')[0])) {
+        // Return a random response from the array
+        return responses[Math.floor(Math.random() * responses.length)];
+      }
+    }
+  }
+  
+  return null;
+};
+
+// Calculate scenario-specific success score
+export const calculateScenarioScore = (
+  metrics: SalesMetrics,
+  scenario: SalesScenario,
+  detectedObjections: string[],
+  sessionDuration: number
+): {
+  overallScore: number;
+  objectiveScores: Record<string, number>;
+  objectionHandling: number;
+  recommendations: string[];
+} => {
+  const { confidence, enthusiasm, persuasiveness } = metrics;
+  const targets = scenario.successMetrics;
+  
+  // Calculate objective completion scores
+  const objectiveScores: Record<string, number> = {};
+  scenario.objectives.forEach(objective => {
+    // Simplified objective scoring based on emotion alignment
+    if (objective.toLowerCase().includes('confidence') || objective.toLowerCase().includes('trust')) {
+      objectiveScores[objective] = confidence;
+    } else if (objective.toLowerCase().includes('enthusiasm') || objective.toLowerCase().includes('excitement')) {
+      objectiveScores[objective] = enthusiasm;
+    } else if (objective.toLowerCase().includes('persuasion') || objective.toLowerCase().includes('close')) {
+      objectiveScores[objective] = persuasiveness;
+    } else {
+      // Default to overall performance
+      objectiveScores[objective] = (confidence + enthusiasm + persuasiveness) / 3;
+    }
+  });
+  
+  // Calculate objection handling score
+  const objectionHandling = detectedObjections.length > 0 
+    ? Math.min(1, detectedObjections.length / scenario.commonObjections.length) 
+    : 0.5; // Neutral if no objections detected
+  
+  // Overall score weighted by scenario targets
+  const confidenceScore = Math.min(confidence / targets.confidence, 1);
+  const enthusiasmScore = Math.min(enthusiasm / targets.enthusiasm, 1);
+  const persuasivenessScore = Math.min(persuasiveness / targets.persuasiveness, 1);
+  
+  const overallScore = (confidenceScore + enthusiasmScore + persuasivenessScore + objectionHandling) / 4;
+  
+  // Generate recommendations
+  const recommendations: string[] = [];
+  if (confidenceScore < 0.8) {
+    recommendations.push(`Increase confidence when dealing with ${buyerPersonas[scenario.persona].name}`);
+  }
+  if (enthusiasmScore < 0.8) {
+    recommendations.push(`Show more appropriate enthusiasm for ${scenario.industry} scenarios`);
+  }
+  if (objectionHandling < 0.6) {
+    recommendations.push(`Practice handling common objections for this persona type`);
+  }
+  
+  return {
+    overallScore,
+    objectiveScores,
+    objectionHandling,
+    recommendations
+  };
+};

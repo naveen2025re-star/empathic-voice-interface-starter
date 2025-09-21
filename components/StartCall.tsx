@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "./ui/button";
 import { Phone } from "lucide-react";
 import { toast } from "sonner";
+import { generateScenarioPrompt, buyerPersonas, type SalesScenario } from "@/utils/salesCoaching";
 
 export default function StartCall({ 
   configId, 
@@ -11,7 +12,7 @@ export default function StartCall({
 }: { 
   configId?: string; 
   accessToken: string; 
-  selectedScript?: {script: string, title: string} | null;
+  selectedScript?: {script: string, title: string, scenario?: SalesScenario} | null;
 }) {
   const { status, connect } = useVoice();
 
@@ -42,8 +43,17 @@ export default function StartCall({
               disabled={!canStartCall}
               onClick={() => {
                 if (!canStartCall) return;
-                  const systemPrompt = selectedScript ? 
-                    `You are an AI sales coach helping a sales representative practice their skills. They are working on: "${selectedScript.title}".
+                
+                let systemPrompt = "You are an AI sales coach. Help the user practice their sales skills with realistic conversation and coaching feedback.";
+                
+                if (selectedScript) {
+                  // Check if this is an advanced scenario with persona and industry details
+                  if (selectedScript.scenario) {
+                    const persona = buyerPersonas[selectedScript.scenario.persona];
+                    systemPrompt = generateScenarioPrompt(selectedScript.scenario, persona);
+                  } else {
+                    // Use the basic prompt for classic scenarios
+                    systemPrompt = `You are an AI sales coach helping a sales representative practice their skills. They are working on: "${selectedScript.title}".
                     
 Context: ${selectedScript.script}
 
@@ -54,8 +64,9 @@ Your role:
 - Be encouraging but honest about areas for improvement
 - Help them practice objection handling and closing techniques
 
-Stay in character as the prospect, but occasionally provide coaching tips like "That was confident!" or "Try slowing down when mentioning the price."` :
-                    "You are an AI sales coach. Help the user practice their sales skills with realistic conversation and coaching feedback.";
+Stay in character as the prospect, but occasionally provide coaching tips like "That was confident!" or "Try slowing down when mentioning the price."`;
+                  }
+                }
 
                   connect({ 
                     auth: { type: "accessToken", value: accessToken },
