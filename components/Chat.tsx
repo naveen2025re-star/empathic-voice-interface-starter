@@ -144,7 +144,7 @@ const SalesCoachingSession = ({
           scriptContent: selectedScript.script,
           messageCount: userMessages.length,
           averageMetrics,
-          coachingFeedback: [...new Set(allFeedback)], // Remove duplicates
+          coachingFeedback: Array.from(new Set(allFeedback)), // Remove duplicates
           conversationSummary
         });
         
@@ -171,7 +171,7 @@ const SalesCoachingSession = ({
       const feedbackMessages = feedback.map(f => f.message);
       setAllFeedback(prev => [...prev, ...feedbackMessages]);
     }
-  }, [latestUserMessage?.id]); // Trigger when a new message arrives
+  }, [latestUserMessage]); // Trigger when a new message arrives
 
   return (
     <>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Chat from "@/components/Chat";
+import ClientComponent from "@/components/Chat";
 import { WelcomeGuide } from "@/components/onboarding/WelcomeGuide";
 
 interface ClientWrapperProps {
@@ -38,7 +38,7 @@ export function ClientWrapper({ accessToken }: ClientWrapperProps) {
 
   return (
     <>
-      <Chat accessToken={accessToken} />
+      <ClientComponent accessToken={accessToken} />
       {showWelcome && <WelcomeGuide onComplete={handleWelcomeComplete} />}
     </>
   );
