@@ -12,10 +12,11 @@ export interface IStorage {
   exportSessionsAsCSV(): Promise<string>;
   exportSessionsAsJSON(): Promise<string>;
   
-  // User operations (required for Replit Auth)
+  // User operations (email-based authentication)
   getUser(id: number): Promise<User | undefined>;
-  getUserByReplitId(replitUserId: string): Promise<User | undefined>;
-  upsertUser(user: UpsertUser): Promise<User>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  createUser(user: UpsertUser): Promise<User>;
+  updateUser(id: number, updates: Partial<UpsertUser>): Promise<User>;
 }
 
 // Database storage implementation
@@ -80,40 +81,33 @@ export class DatabaseStorage implements IStorage {
     return JSON.stringify(allSessions, null, 2);
   }
 
-  // User operations (required for Replit Auth)
+  // User operations (email-based authentication)
   async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
   }
 
-  async getUserByReplitId(replitUserId: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.replitUserId, replitUserId));
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
     return user;
   }
 
-  async upsertUser(userData: UpsertUser): Promise<User> {
-    // For Replit Auth, we need to handle user creation/update based on replit_user_id
-    if (userData.replitUserId) {
-      const existingUser = await this.getUserByReplitId(userData.replitUserId);
-      
-      if (existingUser) {
-        // Update existing user
-        const [user] = await db
-          .update(users)
-          .set({
-            ...userData,
-            updatedAt: new Date(),
-          })
-          .where(eq(users.replitUserId, userData.replitUserId))
-          .returning();
-        return user;
-      }
-    }
-    
-    // Create new user
+  async createUser(userData: UpsertUser): Promise<User> {
     const [user] = await db
       .insert(users)
       .values(userData)
+      .returning();
+    return user;
+  }
+
+  async updateUser(id: number, updates: Partial<UpsertUser>): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({
+        ...updates,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, id))
       .returning();
     return user;
   }

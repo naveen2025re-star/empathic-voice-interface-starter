@@ -1,7 +1,7 @@
 import { pgTable, serial, text, timestamp, integer, real, jsonb, varchar, index } from 'drizzle-orm/pg-core';
 import { relations, sql } from 'drizzle-orm';
 
-// Authentication sessions table (required for Replit Auth)
+// Authentication sessions table (for express-session)
 export const authSessions = pgTable(
   "auth_sessions",
   {
@@ -12,15 +12,15 @@ export const authSessions = pgTable(
   (table) => [index("IDX_session_expire").on(table.expire)],
 );
 
-// Users table (keeping existing structure and adding auth fields)
+// Users table (email-based authentication)
 export const users = pgTable('users', {
   id: serial('id').primaryKey(), // Keep existing integer ID
   username: text('username').notNull().unique(), // Keep existing field
-  email: text('email').unique(),
-  firstName: varchar('first_name'), // Add for auth
-  lastName: varchar('last_name'), // Add for auth
-  profileImageUrl: varchar('profile_image_url'), // Add for auth
-  replitUserId: varchar('replit_user_id').unique(), // Link to Replit auth
+  email: text('email').notNull().unique(), // Required for email auth
+  passwordHash: text('password_hash').notNull(), // Store hashed passwords
+  firstName: text('first_name'), // User profile data
+  lastName: text('last_name'), // User profile data
+  profileImageUrl: text('profile_image_url'), // User profile data
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });
