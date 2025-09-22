@@ -1,7 +1,7 @@
 import { getHumeAccessToken } from "@/utils/getHumeAccessToken";
 import dynamic from "next/dynamic";
 
-const Chat = dynamic(() => import("@/components/Chat"), {
+const SalesAgent = dynamic(() => import("@/components/SalesAgent"), {
   ssr: false,
 });
 
@@ -14,7 +14,7 @@ export default async function Page() {
 
   return (
     <div className={"grow flex flex-col"}>
-      <Chat accessToken={accessToken} />
+      <SalesAgent accessToken={accessToken} />
     </div>
   );
 }
