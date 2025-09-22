@@ -12,7 +12,7 @@ export default function StartCall({ configId, accessToken }: { configId?: string
     <AnimatePresence>
       {status.value !== "connected" ? (
         <motion.div
-          className={"fixed inset-0 p-4 flex items-center justify-center bg-background"}
+          className={"fixed inset-0 p-4 flex items-center justify-center bg-background/95 backdrop-blur-sm z-[60]"}
           initial="initial"
           animate="enter"
           exit="exit"
@@ -69,11 +69,11 @@ export default function StartCall({ configId, accessToken }: { configId?: string
                 <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-accent rounded-full"></div>
-                    <span>End-to-end encrypted</span>
+                    <span>TLS secured connection</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-accent rounded-full"></div>
-                    <span>No data stored</span>
+                    <span>HIPAA-grade privacy</span>
                   </div>
                 </div>
               </div>
