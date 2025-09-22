@@ -6,7 +6,7 @@
 
 - **Communication Style**: Simple, everyday language with therapeutic tone
 - **Design Philosophy**: Consumer-first, calming therapeutic interface with soft color palettes  
-- **Privacy Focus**: On-device data storage, transparent privacy controls, HIPAA-grade standards
+- **Privacy Focus**: On-device data storage, transparent privacy controls, healthcare-level privacy practices
 - **Mental Health Features**: Mood tracking, breathing exercises, crisis resources, emotional insights
 
 # System Architecture
@@ -32,7 +32,7 @@ The application implements healthcare-grade privacy for sensitive mental health 
 - **TLS Encryption**: Voice connections secured with TLS, audio processed but not stored
 - **Privacy Transparency**: Comprehensive privacy modal with data visibility, management controls, and clear deletion options
 - **Crisis Safety**: Crisis language detection with immediate resource provision (988 Suicide Prevention, Crisis Text Line)
-- **HIPAA-Grade Standards**: Mental health data handling follows healthcare privacy requirements
+- **Healthcare-Level Privacy**: Strong privacy practices for sensitive emotional data with transparent user controls
 
 ## Therapeutic Design System
 The application uses a custom therapeutic color palette built with OKLCH color tokens for consistent, calming aesthetics:

@@ -49,9 +49,10 @@ export function MoodTracker({ isVisible, onClose }: MoodTrackerProps) {
     }
   }, []);
 
-  // Save mood history to localStorage
+  // Save mood history to localStorage only with consent
   useEffect(() => {
-    if (moodHistory.length > 0) {
+    const consent = localStorage.getItem('mindspace-data-consent');
+    if (moodHistory.length > 0 && consent === 'true') {
       localStorage.setItem('mindspace-mood-history', JSON.stringify(moodHistory));
     }
   }, [moodHistory]);

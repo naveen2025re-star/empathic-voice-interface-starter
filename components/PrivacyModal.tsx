@@ -111,16 +111,16 @@ export function PrivacyModal({ isVisible, onClose }: PrivacyModalProps) {
                   <div className="flex items-start gap-3 p-4 bg-secondary/50 rounded-lg">
                     <Server className="size-5 text-primary mt-0.5" />
                     <div>
-                      <h4 className="font-medium text-sm">Secure Connections</h4>
-                      <p className="text-sm text-muted-foreground">Voice conversations use TLS encryption. Audio is processed for emotional understanding but not stored or recorded.</p>
+                      <h4 className="font-medium text-sm">Secure Voice Processing</h4>
+                      <p className="text-sm text-muted-foreground">Voice conversations are sent over TLS to Hume AI for emotional analysis. Audio is processed but not stored by Hume. <a href="https://hume.ai/privacy" target="_blank" rel="noopener" className="text-primary underline">View Hume's Privacy Policy</a></p>
                     </div>
                   </div>
                   
                   <div className="flex items-start gap-3 p-4 bg-secondary/50 rounded-lg">
                     <CheckCircle className="size-5 text-primary mt-0.5" />
                     <div>
-                      <h4 className="font-medium text-sm">HIPAA-Grade Standards</h4>
-                      <p className="text-sm text-muted-foreground">We follow healthcare-level privacy standards to protect your sensitive emotional and mental health data.</p>
+                      <h4 className="font-medium text-sm">Healthcare-Level Privacy</h4>
+                      <p className="text-sm text-muted-foreground">We implement strong privacy practices for sensitive emotional data, including local storage and secure processing. This service is for emotional support, not medical treatment.</p>
                     </div>
                   </div>
                 </div>
