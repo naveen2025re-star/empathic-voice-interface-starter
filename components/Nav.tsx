@@ -3,12 +3,22 @@
 import { Button } from "./ui/button";
 import { Moon, Sun, Heart, Shield, BarChart3, Wind } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useEffect, useState, memo, lazy, Suspense } from "react";
+import { useEffect, useState, memo } from "react";
+import dynamic from "next/dynamic";
 
-// Lazy load modals to improve performance
-const MoodTracker = lazy(() => import("./MoodTracker").then(m => ({ default: m.MoodTracker })));
-const BreathingExercise = lazy(() => import("./BreathingExercise").then(m => ({ default: m.BreathingExercise })));
-const PrivacyModal = lazy(() => import("./PrivacyModal").then(m => ({ default: m.PrivacyModal })));
+// Lazy load modals to improve performance (using next/dynamic for better SSR handling)
+const MoodTracker = dynamic(() => import("./MoodTracker").then(m => ({ default: m.MoodTracker })), { 
+  ssr: false,
+  loading: () => null 
+});
+const BreathingExercise = dynamic(() => import("./BreathingExercise").then(m => ({ default: m.BreathingExercise })), { 
+  ssr: false,
+  loading: () => null 
+});
+const PrivacyModal = dynamic(() => import("./PrivacyModal").then(m => ({ default: m.PrivacyModal })), { 
+  ssr: false,
+  loading: () => null 
+});
 
 export const Nav = memo(() => {
   const { theme, setTheme } = useTheme();
@@ -85,19 +95,13 @@ export const Nav = memo(() => {
       
       {/* Only render modals when needed */}
       {showMoodTracker && (
-        <Suspense fallback={null}>
-          <MoodTracker isVisible={showMoodTracker} onClose={() => setShowMoodTracker(false)} />
-        </Suspense>
+        <MoodTracker isVisible={showMoodTracker} onClose={() => setShowMoodTracker(false)} />
       )}
       {showBreathing && (
-        <Suspense fallback={null}>
-          <BreathingExercise isVisible={showBreathing} onClose={() => setShowBreathing(false)} />
-        </Suspense>
+        <BreathingExercise isVisible={showBreathing} onClose={() => setShowBreathing(false)} />
       )}
       {showPrivacy && (
-        <Suspense fallback={null}>
-          <PrivacyModal isVisible={showPrivacy} onClose={() => setShowPrivacy(false)} />
-        </Suspense>
+        <PrivacyModal isVisible={showPrivacy} onClose={() => setShowPrivacy(false)} />
       )}
     </div>
   );
