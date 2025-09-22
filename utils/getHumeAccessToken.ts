@@ -6,37 +6,18 @@ export const getHumeAccessToken = async () => {
   const apiKey = process.env.HUME_API_KEY;
   const secretKey = process.env.HUME_SECRET_KEY;
 
-  // Return null gracefully if credentials are missing
   if (!apiKey || !secretKey) {
-    console.warn('🔑 Hume AI credentials not found in environment variables.');
-    return null;
+    throw new Error('Missing required environment variables (HUME_API_KEY or HUME_SECRET_KEY)');
   }
 
-  try {
-    const accessToken = await fetchAccessToken({
-      apiKey: String(apiKey),
-      secretKey: String(secretKey),
-    });
+  const accessToken = await fetchAccessToken({
+    apiKey: String(process.env.HUME_API_KEY),
+    secretKey: String(process.env.HUME_SECRET_KEY),
+  });
 
-    if (accessToken === "undefined" || !accessToken) {
-      console.warn('⚠️ Unable to get Hume access token - check your API credentials.');
-      return null;
-    }
-
-    console.log('✅ Successfully authenticated with Hume AI!');
-    return accessToken;
-  } catch (error: any) {
-    // Handle invalid credentials specifically
-    if (error.message?.includes('invalid_client') || error.message?.includes('Client credentials are invalid')) {
-      console.warn('🚫 Invalid Hume AI credentials detected.');
-      console.warn('💡 To fix this:');
-      console.warn('   1. Visit https://platform.hume.ai/ to get valid API keys');
-      console.warn('   2. Update your .env.local file with real credentials');
-      console.warn('   3. Restart the development server');
-      return null;
-    }
-    
-    console.warn('❌ Error fetching Hume access token:', error.message || error);
-    return null;
+  if (accessToken === "undefined") {
+    throw new Error('Unable to get access token');
   }
+
+  return accessToken ?? null;
 };

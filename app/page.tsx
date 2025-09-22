@@ -1,6 +1,5 @@
 import { getHumeAccessToken } from "@/utils/getHumeAccessToken";
 import dynamic from "next/dynamic";
-import BusinessDashboard from "@/components/BusinessDashboard";
 
 const Chat = dynamic(() => import("@/components/Chat"), {
   ssr: false,
@@ -9,7 +8,13 @@ const Chat = dynamic(() => import("@/components/Chat"), {
 export default async function Page() {
   const accessToken = await getHumeAccessToken();
 
-  // Always show the business dashboard as the main interface
-  // Pass the access token so it can show voice features when available
-  return <BusinessDashboard accessToken={accessToken} />;
+  if (!accessToken) {
+    throw new Error('Unable to get access token');
+  }
+
+  return (
+    <div className={"grow flex flex-col"}>
+      <Chat accessToken={accessToken} />
+    </div>
+  );
 }
