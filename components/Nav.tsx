@@ -1,13 +1,17 @@
 "use client";
 
 import { Button } from "./ui/button";
-import { Moon, Sun, Heart, Shield } from "lucide-react";
+import { Moon, Sun, Heart, Shield, BarChart3, Wind } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { MoodTracker } from "./MoodTracker";
+import { BreathingExercise } from "./BreathingExercise";
 
 export const Nav = () => {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [showMoodTracker, setShowMoodTracker] = useState(false);
+  const [showBreathing, setShowBreathing] = useState(false);
 
   // Only render theme-dependent content after hydration
   useEffect(() => {
@@ -29,6 +33,24 @@ export const Nav = () => {
 
       {/* Navigation Actions */}
       <div className={"flex items-center gap-2"}>
+        <Button
+          onClick={() => setShowMoodTracker(true)}
+          variant={"ghost"}
+          size={"sm"}
+          className={"flex items-center gap-2 rounded-full text-muted-foreground hover:text-foreground"}
+        >
+          <BarChart3 className={"size-4"} />
+          <span className="hidden sm:inline">Mood Check</span>
+        </Button>
+        <Button
+          onClick={() => setShowBreathing(true)}
+          variant={"ghost"}
+          size={"sm"}
+          className={"flex items-center gap-2 rounded-full text-muted-foreground hover:text-foreground"}
+        >
+          <Wind className={"size-4"} />
+          <span className="hidden sm:inline">Breathe</span>
+        </Button>
         <Button
           variant={"ghost"}
           size={"sm"}
@@ -55,6 +77,9 @@ export const Nav = () => {
           <span className="hidden sm:inline">{!mounted ? "Dark" : theme === 'dark' ? "Light" : "Dark"} Mode</span>
         </Button>
       </div>
+      
+      <MoodTracker isVisible={showMoodTracker} onClose={() => setShowMoodTracker(false)} />
+      <BreathingExercise isVisible={showBreathing} onClose={() => setShowBreathing(false)} />
     </div>
   );
 };
