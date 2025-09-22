@@ -55,44 +55,52 @@ export function BreathingExercise({ isVisible, onClose }: BreathingExerciseProps
   const currentPhase = exercise.phases[currentPhaseIndex];
 
   useEffect(() => {
-    if (isVisible && isActive && secondsLeft > 0) {
-      intervalRef.current = setInterval(() => {
-        setSecondsLeft(prev => {
-          if (prev <= 1) {
-            // Move to next phase
-            const nextPhaseIndex = (currentPhaseIndex + 1) % exercise.phases.length;
-            setCurrentPhaseIndex(nextPhaseIndex);
-            
-            // If we completed a full cycle, increment counter
-            if (nextPhaseIndex === 0) {
-              setCycleCount(prev => prev + 1);
-            }
-            
-            return exercise.phases[nextPhaseIndex].duration;
+    if (!isVisible || !isActive || secondsLeft <= 0) {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      return;
+    }
+
+    intervalRef.current = setInterval(() => {
+      setSecondsLeft(prev => {
+        if (prev <= 1) {
+          // Move to next phase
+          const nextPhaseIndex = (currentPhaseIndex + 1) % exercise.phases.length;
+          setCurrentPhaseIndex(nextPhaseIndex);
+          
+          // If we completed a full cycle, increment counter
+          if (nextPhaseIndex === 0) {
+            setCycleCount(prev => prev + 1);
           }
-          return prev - 1;
-        });
-      }, 1000);
-    } else {
+          
+          return exercise.phases[nextPhaseIndex].duration;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [isVisible, isActive, secondsLeft, currentPhaseIndex, exercise.phases]);
+
+  // Pause exercise and cleanup when modal is closed
+  useEffect(() => {
+    if (!isVisible) {
+      setIsActive(false);
+      setCurrentPhaseIndex(0);
+      setSecondsLeft(0);
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
     }
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, [isVisible, isActive, secondsLeft, currentPhaseIndex, exercise.phases]);
-
-  // Pause exercise when modal is closed
-  useEffect(() => {
-    if (!isVisible && isActive) {
-      setIsActive(false);
-    }
-  }, [isVisible, isActive]);
+  }, [isVisible]);
 
   const startExercise = () => {
     setIsActive(true);

@@ -35,6 +35,8 @@ export function MoodTracker({ isVisible, onClose }: MoodTrackerProps) {
 
   // Load mood history from localStorage
   useEffect(() => {
+    if (!isVisible) return; // Only load when modal is visible
+    
     const saved = localStorage.getItem('mindspace-mood-history');
     if (saved) {
       try {
@@ -47,7 +49,7 @@ export function MoodTracker({ isVisible, onClose }: MoodTrackerProps) {
         console.error('Error loading mood history:', error);
       }
     }
-  }, []);
+  }, [isVisible]);
 
   // Save mood history to localStorage only with consent
   useEffect(() => {

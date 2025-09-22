@@ -3,12 +3,14 @@
 import { Button } from "./ui/button";
 import { Moon, Sun, Heart, Shield, BarChart3, Wind } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
-import { MoodTracker } from "./MoodTracker";
-import { BreathingExercise } from "./BreathingExercise";
-import { PrivacyModal } from "./PrivacyModal";
+import { useEffect, useState, memo, lazy, Suspense } from "react";
 
-export const Nav = () => {
+// Lazy load modals to improve performance
+const MoodTracker = lazy(() => import("./MoodTracker").then(m => ({ default: m.MoodTracker })));
+const BreathingExercise = lazy(() => import("./BreathingExercise").then(m => ({ default: m.BreathingExercise })));
+const PrivacyModal = lazy(() => import("./PrivacyModal").then(m => ({ default: m.PrivacyModal })));
+
+export const Nav = memo(() => {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [showMoodTracker, setShowMoodTracker] = useState(false);
@@ -81,9 +83,24 @@ export const Nav = () => {
         </Button>
       </div>
       
-      <MoodTracker isVisible={showMoodTracker} onClose={() => setShowMoodTracker(false)} />
-      <BreathingExercise isVisible={showBreathing} onClose={() => setShowBreathing(false)} />
-      <PrivacyModal isVisible={showPrivacy} onClose={() => setShowPrivacy(false)} />
+      {/* Only render modals when needed */}
+      {showMoodTracker && (
+        <Suspense fallback={null}>
+          <MoodTracker isVisible={showMoodTracker} onClose={() => setShowMoodTracker(false)} />
+        </Suspense>
+      )}
+      {showBreathing && (
+        <Suspense fallback={null}>
+          <BreathingExercise isVisible={showBreathing} onClose={() => setShowBreathing(false)} />
+        </Suspense>
+      )}
+      {showPrivacy && (
+        <Suspense fallback={null}>
+          <PrivacyModal isVisible={showPrivacy} onClose={() => setShowPrivacy(false)} />
+        </Suspense>
+      )}
     </div>
   );
-};
+});
+
+Nav.displayName = "Nav";

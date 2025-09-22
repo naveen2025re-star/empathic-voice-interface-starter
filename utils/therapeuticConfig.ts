@@ -1,5 +1,29 @@
 import therapeuticPrompts from '../config/therapeutic-prompts.json';
 
+// Throttle function to prevent excessive calls
+function throttle<T extends (...args: any[]) => any>(
+  func: T,
+  delay: number
+): (...args: Parameters<T>) => void {
+  let timeoutId: NodeJS.Timeout | null = null;
+  let lastExecTime = 0;
+  
+  return (...args: Parameters<T>) => {
+    const currentTime = Date.now();
+    
+    if (currentTime - lastExecTime > delay) {
+      func(...args);
+      lastExecTime = currentTime;
+    } else {
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        func(...args);
+        lastExecTime = Date.now();
+      }, delay - (currentTime - lastExecTime));
+    }
+  };
+}
+
 export interface TherapeuticConfig {
   systemPrompt: string;
   conversationStarters: string[];
@@ -40,8 +64,8 @@ export const getRandomEncouragement = (): string => {
   return encouragements[Math.floor(Math.random() * encouragements.length)];
 };
 
-// Safety check for crisis indicators
-export const detectCrisisLanguage = (text: string): string | null => {
+// Safety check for crisis indicators (throttled to prevent spam)
+export const detectCrisisLanguage = throttle((text: string, callback: (crisis: string | null) => void) => {
   const crisisKeywords = {
     suicidal_ideation: ['kill myself', 'end it all', 'don\'t want to live', 'suicide', 'better off dead'],
     domestic_violence: ['he hits me', 'she hurts me', 'afraid to go home', 'domestic violence'],
@@ -51,12 +75,13 @@ export const detectCrisisLanguage = (text: string): string | null => {
 
   for (const [crisis, keywords] of Object.entries(crisisKeywords)) {
     if (keywords.some(keyword => text.toLowerCase().includes(keyword))) {
-      return crisis;
+      callback(crisis);
+      return;
     }
   }
   
-  return null;
-};
+  callback(null);
+}, 2000); // Only check every 2 seconds max
 
 export const getCrisisResource = (crisisType: string): string => {
   const crisisKey = crisisType as keyof typeof therapeuticPrompts.crisisResources;
