@@ -12,7 +12,7 @@ export default function StartCall({ configId, accessToken }: { configId?: string
     <AnimatePresence>
       {status.value !== "connected" ? (
         <motion.div
-          className={"fixed inset-0 p-4 flex items-center justify-center bg-background/95 backdrop-blur-sm z-[60]"}
+          className={"fixed inset-0 p-4 flex items-center justify-center bg-background"}
           initial="initial"
           animate="enter"
           exit="exit"
@@ -30,53 +30,30 @@ export default function StartCall({ configId, accessToken }: { configId?: string
                 exit: { scale: 0.5 },
               }}
             >
-              <div className="text-center space-y-6">
-                <div className="space-y-2">
-                  <h2 className="text-2xl font-semibold text-foreground">
-                    Ready to talk?
-                  </h2>
-                  <p className="text-muted-foreground max-w-md mx-auto">
-                    I'm here to listen with empathy and understanding. Your conversation is private and judgment-free.
-                  </p>
-                </div>
-                
-                <Button
-                  size="lg"
-                  className={"therapeutic-button z-50 flex items-center gap-3 text-lg px-8 py-4"}
-                  onClick={() => {
-                    connect({ 
-                      auth: { type: "accessToken", value: accessToken },
-                      configId, 
-                      // additional options can be added here
-                      // like resumedChatGroupId and sessionSettings
+              <Button
+                className={"z-50 flex items-center gap-1.5 rounded-full"}
+                onClick={() => {
+                  connect({ 
+                    auth: { type: "accessToken", value: accessToken },
+                    configId, 
+                    // additional options can be added here
+                    // like resumedChatGroupId and sessionSettings
+                  })
+                    .then(() => {})
+                    .catch(() => {
+                      toast.error("Unable to start call");
                     })
-                      .then(() => {})
-                      .catch(() => {
-                        toast.error("Unable to connect. Please try again.");
-                      })
-                      .finally(() => {});
-                  }}
-                >
-                  <span>
-                    <Phone
-                      className={"size-5"}
-                      strokeWidth={2}
-                    />
-                  </span>
-                  <span>Start Conversation</span>
-                </Button>
-                
-                <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-accent rounded-full"></div>
-                    <span>TLS secured connection</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-accent rounded-full"></div>
-                    <span>HIPAA-grade privacy</span>
-                  </div>
-                </div>
-              </div>
+                    .finally(() => {});
+                }}
+              >
+                <span>
+                  <Phone
+                    className={"size-4 opacity-50 fill-current"}
+                    strokeWidth={0}
+                  />
+                </span>
+                <span>Start Call</span>
+              </Button>
             </motion.div>
           </AnimatePresence>
         </motion.div>

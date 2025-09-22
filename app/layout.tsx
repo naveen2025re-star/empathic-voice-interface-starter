@@ -2,14 +2,14 @@ import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
+import { Nav } from "@/components/Nav";
 import { cn } from "@/utils";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import { Nav } from "@/components/Nav";
 
 export const metadata: Metadata = {
-  title: "MindSpace - Your AI Emotional Support Companion",
-  description: "A safe, empathetic AI therapist powered by emotion-aware voice technology. Get personalized emotional support, mood tracking, and therapeutic guidance whenever you need it.",
+  title: "Hume AI - EVI - Next.js Starter",
+  description: "A Next.js starter using Hume AI's Empathic Voice Interface",
 };
 
 export default function RootLayout({

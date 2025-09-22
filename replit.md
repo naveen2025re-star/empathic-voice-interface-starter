@@ -1,61 +1,43 @@
 # Overview
 
-**MindSpace** is an AI-powered emotional support companion that transforms Hume AI's Empathic Voice Interface into a therapeutic conversational AI. The application provides real-time voice interactions with emotion detection, mood tracking, breathing exercises, and mental health support tools. It's designed as a consumer-first therapeutic platform that offers empathetic listening and emotional wellness features while maintaining strict privacy standards.
+This is a Next.js starter application that demonstrates Hume AI's Empathic Voice Interface (EVI). The application provides a real-time voice conversation interface that can detect and analyze emotional expressions during voice interactions. It features a modern chat interface with voice controls, emotion visualization, and real-time audio processing capabilities.
 
 # User Preferences
 
-- **Communication Style**: Simple, everyday language with therapeutic tone
-- **Design Philosophy**: Consumer-first, calming therapeutic interface with soft color palettes  
-- **Privacy Focus**: On-device data storage, transparent privacy controls, healthcare-level privacy practices
-- **Mental Health Features**: Mood tracking, breathing exercises, crisis resources, emotional insights
+Preferred communication style: Simple, everyday language.
 
 # System Architecture
 
 ## Frontend Architecture
-The application uses Next.js 14 with App Router and TypeScript for type safety. The UI implements a therapeutic design system using Tailwind CSS with custom OKLCH color tokens for calming blue-green therapeutic palettes. Components are built with shadcn/ui for consistent patterns and Framer Motion for smooth, therapeutic animations.
+The application uses Next.js 14 with the App Router pattern and TypeScript for type safety. The UI is built with React 18 and styled using Tailwind CSS with a shadcn/ui component library for consistent design patterns. The application implements a client-side voice interface using Hume's React SDK for real-time voice interactions.
 
-## Component Structure - Therapeutic AI Features
-The application follows a modular therapeutic architecture:
-- **Chat Component**: Voice conversation orchestrator with therapeutic messaging and empathetic responses
-- **Navigation Component**: Integrated therapeutic tools (mood tracking, breathing exercises, privacy controls)
-- **MoodTracker Component**: Emotional wellness dashboard with mood logging, intensity tracking, and valence-based trend analysis
-- **BreathingExercise Component**: Guided breathing exercises (box breathing, 4-7-8, energizing) with animated visual cues
-- **PrivacyModal Component**: Comprehensive privacy controls, data management, and crisis resources
-- **TherapeuticConfig System**: JSON-based conversation prompts, emotional responses, coping strategies, and crisis detection
+## Component Structure
+The application follows a modular component architecture:
+- **Chat Component**: Main orchestrator for voice interactions, handles message flow and error states
+- **Messages Component**: Displays conversation history with animated message rendering
+- **Controls Component**: Provides voice control interface (mute/unmute, disconnect, microphone visualization)
+- **StartCall Component**: Manages connection initiation with access token authentication
+- **Expressions Component**: Visualizes emotional expression data from voice analysis
 
-## Therapeutic Voice Processing Architecture
-The voice interface leverages Hume's emotion-aware AI for therapeutic conversations. The system processes audio for emotional expression detection and responds with contextually appropriate therapeutic language. The application includes therapeutic conversation starters, emotion-specific responses, and crisis language detection for safety. Voice interactions are designed to provide empathetic listening and emotional validation.
+## Voice Processing Architecture
+The voice interface is powered by Hume's VoiceProvider which manages WebSocket connections for real-time audio streaming. The system processes audio input through microphone FFT analysis and provides emotional expression detection with confidence scores. Voice controls support mute/unmute functionality and visual feedback through animated microphone indicators.
 
-## Privacy & Security - Mental Health Focus
-The application implements healthcare-grade privacy for sensitive mental health data:
-- **On-Device Storage**: Mood and wellness data stored locally via localStorage with user consent controls
-- **TLS Encryption**: Voice connections secured with TLS, audio processed but not stored
-- **Privacy Transparency**: Comprehensive privacy modal with data visibility, management controls, and clear deletion options
-- **Crisis Safety**: Crisis language detection with immediate resource provision (988 Suicide Prevention, Crisis Text Line)
-- **Healthcare-Level Privacy**: Strong privacy practices for sensitive emotional data with transparent user controls
+## Authentication & Security
+Authentication uses Hume's access token system generated server-side from API and secret keys. The application implements secure token fetching on the server using the 'server-only' package to prevent client-side exposure of sensitive credentials. Access tokens are passed to client components for voice connection establishment.
 
-## Therapeutic Design System
-The application uses a custom therapeutic color palette built with OKLCH color tokens for consistent, calming aesthetics:
-- **Light Theme**: Soft blue-white backgrounds with therapeutic blue primary colors and gentle green accents
-- **Dark Theme**: Deep blue-gray backgrounds with softer primary colors for reduced eye strain
-- **Therapeutic Components**: Custom CSS classes (therapeutic-card, therapeutic-button, therapeutic-accent) for consistent therapeutic styling
-- **Smooth Transitions**: All elements include gentle transitions and micro-animations for a calming user experience
+## Styling & Theme System
+The application uses Tailwind CSS with a custom design system based on CSS custom properties for color theming. A dark/light theme system is implemented using next-themes with smooth transitions. The design follows a modern, card-based layout with rounded corners and subtle shadows.
 
-## State Management - Wellness Data
-Component state manages therapeutic features and wellness data:
-- **Voice State**: VoiceProvider manages therapeutic conversation state and emotional context
-- **Mood Data**: MoodTracker persists emotional wellness data locally with timestamp and valence tracking
-- **Breathing State**: BreathingExercise manages guided breathing sessions with proper cleanup on modal close
-- **Privacy State**: User consent and data visibility preferences managed across components
-- **Therapeutic Context**: Emotion-based responses and coping strategies loaded from JSON configuration
+## State Management
+Component state is managed through React hooks and context patterns. The VoiceProvider handles voice-related state including connection status, muting state, and message history. Local component state manages UI interactions and animations using Framer Motion for smooth transitions.
 
 # External Dependencies
 
-## Hume AI Services - Therapeutic Configuration
-- **@humeai/voice-react**: React SDK configured for therapeutic voice interactions with emotion detection
-- **hume**: Core SDK for empathetic AI responses and emotional intelligence
-- **Required Environment Variables**: HUME_API_KEY and HUME_SECRET_KEY for production therapeutic conversations
-- **Therapeutic Prompts**: Custom JSON configuration with conversation starters, emotion responses, coping strategies, and crisis resources
+## Hume AI Services
+- **@humeai/voice-react**: React SDK for voice interface integration
+- **hume**: Core Hume AI SDK for access token generation and API interactions
+- Requires HUME_API_KEY and HUME_SECRET_KEY environment variables
+- Optional NEXT_PUBLIC_HUME_CONFIG_ID for custom voice configurations
 
 ## UI and Animation Libraries
 - **shadcn/ui**: Component library built on Radix UI primitives
@@ -79,8 +61,4 @@ Component state manages therapeutic features and wellness data:
 - **clsx**: Conditional className utility
 
 ## Deployment Platform
-Configured for Vercel deployment as a mental health support platform:
-- **Environment Management**: Secure Hume AI credentials for production therapeutic conversations
-- **Privacy Compliance**: On-device storage reduces server-side data exposure for sensitive mental health information
-- **Crisis Resources**: Integrated crisis support hotlines and safety resources for mental health emergencies
-- **Consumer Ready**: Professional therapeutic interface suitable for direct consumer mental health support
+Configured for Vercel deployment with environment variable management for Hume AI credentials and optional configuration IDs.
