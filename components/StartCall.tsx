@@ -1,80 +1,42 @@
 import { useVoice } from "@humeai/voice-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import { Button } from "./ui/button";
 import { Phone } from "lucide-react";
 import { toast } from "sonner";
-import { generateScenarioPrompt, buyerPersonas, type SalesScenario } from "@/utils/salesCoaching";
 
-export default function StartCall({ 
-  configId, 
-  accessToken, 
-  selectedScript 
-}: { 
-  configId?: string; 
-  accessToken: string; 
-  selectedScript?: {script: string, title: string, scenario?: SalesScenario} | null;
-}) {
+export default function StartCall({ configId, accessToken }: { configId?: string, accessToken: string }) {
   const { status, connect } = useVoice();
-
-  const canStartCall = selectedScript !== null;
 
   return (
     <AnimatePresence>
       {status.value !== "connected" ? (
         <motion.div
-          className={"fixed bottom-4 right-4 z-50"}
+          className={"fixed inset-0 p-4 flex items-center justify-center bg-background"}
           initial="initial"
           animate="enter"
           exit="exit"
           variants={{
-            initial: { opacity: 0, scale: 0.8 },
-            enter: { opacity: 1, scale: 1 },
-            exit: { opacity: 0, scale: 0.8 },
+            initial: { opacity: 0 },
+            enter: { opacity: 1 },
+            exit: { opacity: 0 },
           }}
         >
-          <div className="flex flex-col items-end gap-2">
-            {!canStartCall && (
-              <div className="bg-muted text-muted-foreground text-xs px-3 py-1 rounded-full">
-                Choose a sales script first
-              </div>
-            )}
-            <Button
-              className={"flex items-center gap-1.5 rounded-full"}
-              disabled={!canStartCall}
-              onClick={() => {
-                if (!canStartCall) return;
-                
-                let systemPrompt = "You are an AI sales coach. Help the user practice their sales skills with realistic conversation and coaching feedback.";
-                
-                if (selectedScript) {
-                  // Check if this is an advanced scenario with persona and industry details
-                  if (selectedScript.scenario) {
-                    const persona = buyerPersonas[selectedScript.scenario.persona];
-                    systemPrompt = generateScenarioPrompt(selectedScript.scenario, persona);
-                  } else {
-                    // Use the basic prompt for classic scenarios
-                    systemPrompt = `You are an AI sales coach helping a sales representative practice their skills. They are working on: "${selectedScript.title}".
-                    
-Context: ${selectedScript.script}
-
-Your role:
-- Act as a potential customer/prospect in this scenario
-- Respond naturally and realistically as someone in this situation would
-- Provide brief coaching feedback after their pitch attempts
-- Be encouraging but honest about areas for improvement
-- Help them practice objection handling and closing techniques
-
-Stay in character as the prospect, but occasionally provide coaching tips like "That was confident!" or "Try slowing down when mentioning the price."`;
-                  }
-                }
-
+          <AnimatePresence>
+            <motion.div
+              variants={{
+                initial: { scale: 0.5 },
+                enter: { scale: 1 },
+                exit: { scale: 0.5 },
+              }}
+            >
+              <Button
+                className={"z-50 flex items-center gap-1.5 rounded-full"}
+                onClick={() => {
                   connect({ 
                     auth: { type: "accessToken", value: accessToken },
-                    configId,
-                    sessionSettings: {
-                      type: "session_settings",
-                      systemPrompt: systemPrompt
-                    }
+                    configId, 
+                    // additional options can be added here
+                    // like resumedChatGroupId and sessionSettings
                   })
                     .then(() => {})
                     .catch(() => {
@@ -89,9 +51,10 @@ Stay in character as the prospect, but occasionally provide coaching tips like "
                     strokeWidth={0}
                   />
                 </span>
-                <span>Start Practice Session</span>
+                <span>Start Call</span>
               </Button>
-            </div>
+            </motion.div>
+          </AnimatePresence>
         </motion.div>
       ) : null}
     </AnimatePresence>

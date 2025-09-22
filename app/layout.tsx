@@ -6,11 +6,10 @@ import { Nav } from "@/components/Nav";
 import { cn } from "@/utils";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import { QueryProvider } from "@/components/QueryProvider";
 
 export const metadata: Metadata = {
-  title: "EmotiClose - AI Sales Coach",
-  description: "Transform your sales performance with AI-powered emotion coaching and real-time feedback",
+  title: "Hume AI - EVI - Next.js Starter",
+  description: "A Next.js starter using Hume AI's Empathic Voice Interface",
 };
 
 export default function RootLayout({
@@ -19,26 +18,24 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <body
         className={cn(
           GeistSans.variable,
           GeistMono.variable,
           "flex flex-col min-h-screen"
         )}
-        suppressHydrationWarning
       >
-        <QueryProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-            <Toaster position="top-center" richColors={true} />
-          </ThemeProvider>
-        </QueryProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Nav />
+          {children}
+          <Toaster position="top-center" richColors={true} />
+        </ThemeProvider>
       </body>
     </html>
   );
