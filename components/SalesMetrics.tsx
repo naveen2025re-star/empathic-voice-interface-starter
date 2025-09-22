@@ -1,13 +1,11 @@
 "use client";
-import { calculateSalesMetrics, SalesMetrics as ISalesMetrics, CoachingFeedback as ICoachingFeedback } from "@/utils/salesCoaching";
+import { calculateSalesMetrics, SalesMetrics as ISalesMetrics } from "@/utils/salesCoaching";
 import { motion } from "framer-motion";
 import { CSSProperties, memo, useMemo } from "react";
 import { TrendingUp, TrendingDown, Zap, Heart, Shield, Target } from "lucide-react";
-import CoachingTipsPanel from "@/components/CoachingTipsPanel";
 
 interface SalesMetricsProps {
   values: Record<string, number>;
-  coachingTips?: ICoachingFeedback[];
 }
 
 const metricConfig = {
@@ -60,75 +58,69 @@ function SalesMetrics({ values }: SalesMetricsProps) {
   }, [metrics]);
 
   return (
-    <div className="h-full flex flex-col">
-      {/* Fixed header with overall score */}
-      <div className="flex-shrink-0 p-4 pb-2">
-        <div className="p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <Shield className="size-5 text-primary" />
-              <span className="font-semibold text-primary">Sales Performance</span>
-            </div>
-            <div className="text-2xl font-bold text-primary">
-              {Math.round(metrics.overall_score * 100)}%
-            </div>
+    <div className="p-4 w-full">
+      {/* Overall Score */}
+      <div className="mb-6 p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <Shield className="size-5 text-primary" />
+            <span className="font-semibold text-primary">Sales Performance</span>
           </div>
-          <div className="w-full bg-muted rounded-full h-2">
-            <motion.div
-              className="bg-primary h-2 rounded-full"
-              initial={{ width: 0 }}
-              animate={{ width: `${metrics.overall_score * 100}%` }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-            />
+          <div className="text-2xl font-bold text-primary">
+            {Math.round(metrics.overall_score * 100)}%
           </div>
+        </div>
+        <div className="w-full bg-muted rounded-full h-2">
+          <motion.div
+            className="bg-primary h-2 rounded-full"
+            initial={{ width: 0 }}
+            animate={{ width: `${metrics.overall_score * 100}%` }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          />
         </div>
       </div>
 
-      {/* Scrollable content area */}
-      <div className="flex-1 overflow-y-auto px-4 pb-4">
-        {/* Individual Metrics */}
-        <div className="grid gap-3 mb-6">
-          {sortedMetrics.map(({ key, displayValue }) => {
-            const config = metricConfig[key];
-            const IconComponent = config.icon;
-            
-            return (
-              <div key={key} className="flex items-center justify-between p-3 bg-card rounded-lg border">
-                <div className="flex items-center gap-3">
-                  <div 
-                    className="w-8 h-8 rounded-full flex items-center justify-center"
-                    style={{ backgroundColor: `${config.color}20` }}
-                  >
-                    <IconComponent 
-                      className="size-4" 
-                      style={{ color: config.color }}
-                    />
-                  </div>
-                  <div>
-                    <div className="font-medium text-sm">{config.label}</div>
-                    <div className="text-xs text-muted-foreground">{config.description}</div>
-                  </div>
+      {/* Individual Metrics */}
+      <div className="grid gap-3">
+        {sortedMetrics.map(({ key, displayValue }) => {
+          const config = metricConfig[key];
+          const IconComponent = config.icon;
+          
+          return (
+            <div key={key} className="flex items-center justify-between p-3 bg-card rounded-lg border">
+              <div className="flex items-center gap-3">
+                <div 
+                  className="w-8 h-8 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: `${config.color}20` }}
+                >
+                  <IconComponent 
+                    className="size-4" 
+                    style={{ color: config.color }}
+                  />
                 </div>
-                
-                <div className="flex items-center gap-3">
-                  <div className="text-sm font-semibold tabular-nums">
-                    {Math.round(displayValue * 100)}%
-                  </div>
-                  <div className="w-16 bg-muted rounded-full h-2">
-                    <motion.div
-                      className="h-2 rounded-full"
-                      style={{ backgroundColor: config.color }}
-                      initial={{ width: 0 }}
-                      animate={{ width: `${displayValue * 100}%` }}
-                      transition={{ duration: 0.6, delay: 0.1 }}
-                    />
-                  </div>
+                <div>
+                  <div className="font-medium text-sm">{config.label}</div>
+                  <div className="text-xs text-muted-foreground">{config.description}</div>
                 </div>
               </div>
-            );
-          })}
-        </div>
-
+              
+              <div className="flex items-center gap-3">
+                <div className="text-sm font-semibold tabular-nums">
+                  {Math.round(displayValue * 100)}%
+                </div>
+                <div className="w-16 bg-muted rounded-full h-2">
+                  <motion.div
+                    className="h-2 rounded-full"
+                    style={{ backgroundColor: config.color }}
+                    initial={{ width: 0 }}
+                    animate={{ width: `${displayValue * 100}%` }}
+                    transition={{ duration: 0.6, delay: 0.1 }}
+                  />
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

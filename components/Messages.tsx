@@ -21,7 +21,7 @@ const Messages = forwardRef<
   return (
     <motion.div
       layoutScroll
-      className={"h-full overflow-auto p-4 pt-24 custom-scrollbar"}
+      className={"grow overflow-auto p-4 pt-24 custom-scrollbar"}
       ref={ref}
       style={{
         // Hardware acceleration for smooth scrolling
