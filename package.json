@@ -4,7 +4,9 @@
   "private": true,
   "homepage": "https://github.com/humeai/hume-evi-next-js-starter",
   "scripts": {
-    "dev": "next dev",
+    "dev": "TURBOPACK=1 next dev --turbo",
+    "dev:webpack": "next dev",
+    "dev:fast": "TURBOPACK=1 next dev --turbo --experimental-https",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
