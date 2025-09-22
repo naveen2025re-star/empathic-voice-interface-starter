@@ -1,5 +1,6 @@
 import { getHumeAccessToken } from "@/utils/getHumeAccessToken";
 import dynamic from "next/dynamic";
+import BusinessDashboard from "@/components/BusinessDashboard";
 
 const Chat = dynamic(() => import("@/components/Chat"), {
   ssr: false,
@@ -8,8 +9,9 @@ const Chat = dynamic(() => import("@/components/Chat"), {
 export default async function Page() {
   const accessToken = await getHumeAccessToken();
 
+  // If no access token available, show the business dashboard instead
   if (!accessToken) {
-    throw new Error('Unable to get access token');
+    return <BusinessDashboard />;
   }
 
   return (
