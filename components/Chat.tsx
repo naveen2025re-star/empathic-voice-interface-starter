@@ -142,8 +142,22 @@ export default function ClientComponent({
         {/* Hybrid Chat Input */}
         <HybridChatInput 
           onTextMessage={(message) => {
-            // Handle text messages through voice provider or separately
-            toast.info(`Text message: ${message.slice(0, 50)}...`);
+            // Add text message to conversation state for sales intelligence
+            setAllMessages(prev => [...prev, {
+              type: 'user_message',
+              message: { role: 'user', content: message },
+              receivedAt: new Date(),
+              models: { prosody: { scores: {} } } // Empty emotions for text
+            }]);
+            
+            // Track conversation for sales intelligence
+            setConversationLength(prev => prev + 1);
+            
+            // Show user feedback
+            toast.success(`Message sent: ${message.slice(0, 30)}...`);
+            
+            // TODO: Send to AI agent for response via API
+            // This would integrate with the AI conversation backend
           }}
         />
         

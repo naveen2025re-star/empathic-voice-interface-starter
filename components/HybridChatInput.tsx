@@ -36,21 +36,16 @@ export default function HybridChatInput({ onTextMessage, disabled }: HybridChatI
     }
   };
 
-  const handleVoiceToggle = async () => {
+  const handleVoiceToggle = () => {
+    // Only handle mute/unmute - connection should be managed by StartCall component
     if (status.value === 'connected') {
       if (isMuted) {
         unmute();
       } else {
         mute();
       }
-    } else {
-      try {
-        await connect?.();
-        console.log('Connected to voice');
-      } catch (error) {
-        console.error('Failed to connect:', error);
-      }
     }
+    // Note: Connection should be initiated through the StartCall component
   };
 
   const isVoiceActive = status.value === 'connected' && !isMuted;
