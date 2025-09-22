@@ -1,10 +1,11 @@
 "use client";
 
 import { cn } from "@/utils";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { AutoSizer } from "react-virtualized";
+import { memo } from "react";
 
-export default function MicFFT({
+const MicFFT = memo(function MicFFT({
   fft,
   className,
 }: {
@@ -42,4 +43,6 @@ export default function MicFFT({
       </AutoSizer>
     </div>
   );
-}
+});
+
+export default MicFFT;

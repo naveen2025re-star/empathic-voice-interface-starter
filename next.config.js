@@ -1,8 +1,23 @@
 /** @type {import('next').NextConfig} */
+const isDev = process.env.NODE_ENV === 'development';
+
 const nextConfig = {
   experimental: {
-    serverComponentsExternalPackages: ["hume"]
+    serverComponentsExternalPackages: ["hume"],
+    optimizeCss: true,
+    ...(isDev && {
+      allowedRevalidateHeaderKeys: ['host'],
+    })
   },
+  // Compiler optimizations
+  compiler: {
+    // Remove console logs in production for better performance
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  // Performance optimizations
+  swcMinify: true,
+  poweredByHeader: false,
+  reactStrictMode: true,
   async headers() {
     return [
       {
@@ -10,7 +25,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'no-cache, no-store, must-revalidate'
+            value: isDev ? 'no-cache, no-store, must-revalidate' : 'public, max-age=31536000, immutable'
           }
         ]
       }
@@ -19,14 +34,7 @@ const nextConfig = {
   // Allow Replit's proxy/iframe hosting
   async rewrites() {
     return [];
-  },
-  // Configure for development in Replit environment
-  ...(process.env.NODE_ENV === 'development' && {
-    experimental: {
-      ...this?.experimental,
-      allowedRevalidateHeaderKeys: ['host'],
-    }
-  })
+  }
 };
 
 module.exports = nextConfig;
