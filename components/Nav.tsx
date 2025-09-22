@@ -31,7 +31,7 @@ export const Nav = () => {
           <span>
             <Github className={"size-4"} />
           </span>
-          <span>AI Sales Agent</span>
+          <span>Star on GitHub</span>
         </Button>
         <Button
           onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
