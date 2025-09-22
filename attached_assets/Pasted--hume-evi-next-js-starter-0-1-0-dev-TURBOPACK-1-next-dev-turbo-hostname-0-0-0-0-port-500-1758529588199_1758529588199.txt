@@ -1,0 +1,212 @@
+
+> hume-evi-next-js-starter@0.1.0 dev
+> TURBOPACK=1 next dev --turbo --hostname 0.0.0.0 --port 5000
+
+  ▲ Next.js 14.2.3 (turbo)
+  - Local:        http://localhost:5000
+  - Network:      http://0.0.0.0:5000
+  - Environments: .env.local
+  - Experiments (use with caution):
+    · optimizeCss
+
+ ✓ Starting...
+ ✓ Ready in 1792ms
+ ○ Compiling / ...
+ ✓ Compiled / in 9.8s
+Error fetching Hume access token: ZodError: [
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "access_token"
+    ],
+    "message": "Required"
+  }
+]
+    at get error [as error] (/home/runner/workspace/node_modules/hume/node_modules/zod/v3/types.cjs:45:31)
+    at ZodEffects.parse (/home/runner/workspace/node_modules/hume/node_modules/zod/v3/types.cjs:120:22)
+    at /home/runner/workspace/node_modules/hume/wrapper/fetchAccessToken.js:52:10
+    at Generator.next (<anonymous>)
+    at fulfilled (/home/runner/workspace/node_modules/hume/wrapper/fetchAccessToken.js:5:58)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+  issues: [
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    }
+  ],
+  addIssue: [Function (anonymous)],
+  addIssues: [Function (anonymous)],
+  errors: [
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    }
+  ]
+}
+Error fetching Hume access token: ZodError: [
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "access_token"
+    ],
+    "message": "Required"
+  }
+]
+    at get error [as error] (/home/runner/workspace/node_modules/hume/node_modules/zod/v3/types.cjs:45:31)
+    at ZodEffects.parse (/home/runner/workspace/node_modules/hume/node_modules/zod/v3/types.cjs:120:22)
+    at /home/runner/workspace/node_modules/hume/wrapper/fetchAccessToken.js:52:10
+    at Generator.next (<anonymous>)
+    at fulfilled (/home/runner/workspace/node_modules/hume/wrapper/fetchAccessToken.js:5:58)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+  issues: [
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    }
+  ],
+  addIssue: [Function (anonymous)],
+  addIssues: [Function (anonymous)],
+  errors: [
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    }
+  ]
+}
+Error fetching Hume access token: ZodError: [
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "access_token"
+    ],
+    "message": "Required"
+  }
+]
+    at get error [as error] (/home/runner/workspace/node_modules/hume/node_modules/zod/v3/types.cjs:45:31)
+    at ZodEffects.parse (/home/runner/workspace/node_modules/hume/node_modules/zod/v3/types.cjs:120:22)
+    at /home/runner/workspace/node_modules/hume/wrapper/fetchAccessToken.js:52:10
+    at Generator.next (<anonymous>)
+    at fulfilled (/home/runner/workspace/node_modules/hume/wrapper/fetchAccessToken.js:5:58)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+  issues: [
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    }
+  ],
+  addIssue: [Function (anonymous)],
+  addIssues: [Function (anonymous)],
+  errors: [
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    }
+  ]
+}
+ GET / 200 in 10811ms
+ GET / 200 in 11130ms
+ ✓ Compiled in 802ms
+ ✓ Compiled / in 47ms
+Error fetching Hume access token: ZodError: [
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "access_token"
+    ],
+    "message": "Required"
+  }
+]
+    at get error [as error] (/home/runner/workspace/node_modules/hume/node_modules/zod/v3/types.cjs:45:31)
+    at ZodEffects.parse (/home/runner/workspace/node_modules/hume/node_modules/zod/v3/types.cjs:120:22)
+    at /home/runner/workspace/node_modules/hume/wrapper/fetchAccessToken.js:52:10
+    at Generator.next (<anonymous>)
+    at fulfilled (/home/runner/workspace/node_modules/hume/wrapper/fetchAccessToken.js:5:58)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+  issues: [
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    }
+  ],
+  addIssue: [Function (anonymous)],
+  addIssues: [Function (anonymous)],
+  errors: [
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    }
+  ]
+}
+Error fetching Hume access token: ZodError: [
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "access_token"
+    ],
+    "message": "Required"
+  }
+]
+    at get error [as error] (/home/runner/workspace/node_modules/hume/node_modules/zod/v3/types.cjs:45:31)
+    at ZodEffects.parse (/home/runner/workspace/node_modules/hume/node_modules/zod/v3/types.cjs:120:22)
+    at /home/runner/workspace/node_modules/hume/wrapper/fetchAccessToken.js:52:10
+    at Generator.next (<anonymous>)
+    at fulfilled (/home/runner/workspace/node_modules/hume/wrapper/fetchAccessToken.js:5:58)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+  issues: [
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    }
+  ],
+  addIssue: [Function (anonymous)],
+  addIssues: [Function (anonymous)],
+  errors: [
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    }
+  ]
+}
+ GET / 200 in 194ms
+ ✓ Compiled /favicon.ico in 166ms
+ GET /favicon.ico 200 in 214ms
