@@ -6,12 +6,14 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { MoodTracker } from "./MoodTracker";
 import { BreathingExercise } from "./BreathingExercise";
+import { PrivacyModal } from "./PrivacyModal";
 
 export const Nav = () => {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [showMoodTracker, setShowMoodTracker] = useState(false);
   const [showBreathing, setShowBreathing] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
 
   // Only render theme-dependent content after hydration
   useEffect(() => {
@@ -52,6 +54,7 @@ export const Nav = () => {
           <span className="hidden sm:inline">Breathe</span>
         </Button>
         <Button
+          onClick={() => setShowPrivacy(true)}
           variant={"ghost"}
           size={"sm"}
           className={"flex items-center gap-2 rounded-full text-muted-foreground hover:text-foreground"}
@@ -80,6 +83,7 @@ export const Nav = () => {
       
       <MoodTracker isVisible={showMoodTracker} onClose={() => setShowMoodTracker(false)} />
       <BreathingExercise isVisible={showBreathing} onClose={() => setShowBreathing(false)} />
+      <PrivacyModal isVisible={showPrivacy} onClose={() => setShowPrivacy(false)} />
     </div>
   );
 };

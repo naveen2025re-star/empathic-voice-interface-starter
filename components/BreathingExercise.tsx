@@ -55,7 +55,7 @@ export function BreathingExercise({ isVisible, onClose }: BreathingExerciseProps
   const currentPhase = exercise.phases[currentPhaseIndex];
 
   useEffect(() => {
-    if (isActive && secondsLeft > 0) {
+    if (isVisible && isActive && secondsLeft > 0) {
       intervalRef.current = setInterval(() => {
         setSecondsLeft(prev => {
           if (prev <= 1) {
@@ -85,7 +85,14 @@ export function BreathingExercise({ isVisible, onClose }: BreathingExerciseProps
         clearInterval(intervalRef.current);
       }
     };
-  }, [isActive, secondsLeft, currentPhaseIndex, exercise.phases]);
+  }, [isVisible, isActive, secondsLeft, currentPhaseIndex, exercise.phases]);
+
+  // Pause exercise when modal is closed
+  useEffect(() => {
+    if (!isVisible && isActive) {
+      setIsActive(false);
+    }
+  }, [isVisible, isActive]);
 
   const startExercise = () => {
     setIsActive(true);

@@ -75,11 +75,34 @@ export function MoodTracker({ isVisible, onClose }: MoodTrackerProps) {
     if (moodHistory.length < 2) return null;
     
     const recent = moodHistory.slice(0, 5);
-    const avgIntensity = recent.reduce((sum, entry) => sum + entry.intensity, 0) / recent.length;
     
-    if (avgIntensity > 7) return { trend: "improving", message: "Your mood has been trending upward lately! 🌟" };
-    if (avgIntensity < 4) return { trend: "concerning", message: "I notice you've been feeling down. Remember, I'm here to support you." };
-    return { trend: "stable", message: "Your mood seems stable. Keep taking care of yourself." };
+    // Map moods to valence scores (positive/negative/neutral)
+    const moodValence = {
+      happy: 1,
+      calm: 1,
+      neutral: 0,
+      sad: -1,
+      anxious: -1
+    };
+    
+    // Calculate weighted mood score (valence * intensity)
+    const weightedScore = recent.reduce((sum, entry) => {
+      const valence = moodValence[entry.mood];
+      return sum + (valence * entry.intensity);
+    }, 0) / recent.length;
+    
+    if (weightedScore > 3) return { 
+      trend: "improving", 
+      message: "Your mood has been trending upward lately! 🌟" 
+    };
+    if (weightedScore < -3) return { 
+      trend: "concerning", 
+      message: "I notice you've been experiencing some difficult emotions. Remember, I'm here to support you, and reaching out for help is always okay." 
+    };
+    return { 
+      trend: "stable", 
+      message: "Your mood seems balanced. Keep taking care of yourself." 
+    };
   };
 
   if (!isVisible) return null;
@@ -183,10 +206,25 @@ export function MoodTracker({ isVisible, onClose }: MoodTrackerProps) {
               {/* Recent History */}
               {moodHistory.length > 0 && (
                 <div className="space-y-4">
-                  <h3 className="font-medium flex items-center gap-2">
-                    <Calendar className="size-4" />
-                    Recent Entries
-                  </h3>
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-medium flex items-center gap-2">
+                      <Calendar className="size-4" />
+                      Recent Entries
+                    </h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        if (confirm("Are you sure you want to clear all mood history? This cannot be undone.")) {
+                          setMoodHistory([]);
+                          localStorage.removeItem('mindspace-mood-history');
+                        }
+                      }}
+                      className="text-xs text-muted-foreground hover:text-destructive"
+                    >
+                      Clear History
+                    </Button>
+                  </div>
                   
                   <div className="space-y-2 max-h-40 overflow-y-auto">
                     {moodHistory.slice(0, 10).map((entry) => {
