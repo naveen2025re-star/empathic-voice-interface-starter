@@ -30,30 +30,53 @@ export default function StartCall({ configId, accessToken }: { configId?: string
                 exit: { scale: 0.5 },
               }}
             >
-              <Button
-                className={"z-50 flex items-center gap-1.5 rounded-full"}
-                onClick={() => {
-                  connect({ 
-                    auth: { type: "accessToken", value: accessToken },
-                    configId, 
-                    // additional options can be added here
-                    // like resumedChatGroupId and sessionSettings
-                  })
-                    .then(() => {})
-                    .catch(() => {
-                      toast.error("Unable to start call");
+              <div className="text-center space-y-6">
+                <div className="space-y-2">
+                  <h2 className="text-2xl font-semibold text-foreground">
+                    Ready to talk?
+                  </h2>
+                  <p className="text-muted-foreground max-w-md mx-auto">
+                    I'm here to listen with empathy and understanding. Your conversation is private and judgment-free.
+                  </p>
+                </div>
+                
+                <Button
+                  size="lg"
+                  className={"therapeutic-button z-50 flex items-center gap-3 text-lg px-8 py-4"}
+                  onClick={() => {
+                    connect({ 
+                      auth: { type: "accessToken", value: accessToken },
+                      configId, 
+                      // additional options can be added here
+                      // like resumedChatGroupId and sessionSettings
                     })
-                    .finally(() => {});
-                }}
-              >
-                <span>
-                  <Phone
-                    className={"size-4 opacity-50 fill-current"}
-                    strokeWidth={0}
-                  />
-                </span>
-                <span>Start Call</span>
-              </Button>
+                      .then(() => {})
+                      .catch(() => {
+                        toast.error("Unable to connect. Please try again.");
+                      })
+                      .finally(() => {});
+                  }}
+                >
+                  <span>
+                    <Phone
+                      className={"size-5"}
+                      strokeWidth={2}
+                    />
+                  </span>
+                  <span>Start Conversation</span>
+                </Button>
+                
+                <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-accent rounded-full"></div>
+                    <span>End-to-end encrypted</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-accent rounded-full"></div>
+                    <span>No data stored</span>
+                  </div>
+                </div>
+              </div>
             </motion.div>
           </AnimatePresence>
         </motion.div>

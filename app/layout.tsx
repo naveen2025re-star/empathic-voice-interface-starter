@@ -8,8 +8,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/ThemeProvider";
 
 export const metadata: Metadata = {
-  title: "Hume AI - EVI - Next.js Starter",
-  description: "A Next.js starter using Hume AI's Empathic Voice Interface",
+  title: "MindSpace - Your AI Emotional Support Companion",
+  description: "A safe, empathetic AI therapist powered by emotion-aware voice technology. Get personalized emotional support, mood tracking, and therapeutic guidance whenever you need it.",
 };
 
 export default function RootLayout({

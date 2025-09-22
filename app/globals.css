@@ -4,25 +4,26 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  /* Therapeutic Light Theme - Calming and Professional */
+  --background: oklch(0.99 0.01 240); /* Very soft blue-tinted white */
+  --foreground: oklch(0.25 0.02 220); /* Warm dark blue-gray for readability */
+  --card: oklch(1 0 0); /* Pure white cards for clarity */
+  --card-foreground: oklch(0.25 0.02 220);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --popover-foreground: oklch(0.25 0.02 220);
+  --primary: oklch(0.65 0.15 250); /* Therapeutic blue - calming and trustworthy */
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.95 0.02 240); /* Very light therapeutic blue */
+  --secondary-foreground: oklch(0.35 0.02 220);
+  --muted: oklch(0.97 0.01 240);
+  --muted-foreground: oklch(0.45 0.02 220);
+  --accent: oklch(0.85 0.08 140); /* Soft therapeutic green */
+  --accent-foreground: oklch(0.25 0.02 220);
+  --destructive: oklch(0.70 0.15 15); /* Gentle red, less alarming */
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.90 0.01 240);
+  --input: oklch(0.98 0.01 240);
+  --ring: oklch(0.65 0.15 250);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -40,25 +41,26 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
+  /* Therapeutic Dark Theme - Soothing and Easy on Eyes */
+  --background: oklch(0.12 0.02 240); /* Deep blue-gray, easier than pure black */
+  --foreground: oklch(0.95 0.01 240); /* Soft white for readability */
+  --card: oklch(0.18 0.02 240); /* Slightly lighter blue-gray cards */
+  --card-foreground: oklch(0.95 0.01 240);
+  --popover: oklch(0.18 0.02 240);
+  --popover-foreground: oklch(0.95 0.01 240);
+  --primary: oklch(0.75 0.12 250); /* Softer therapeutic blue for dark mode */
+  --primary-foreground: oklch(0.12 0.02 240);
+  --secondary: oklch(0.25 0.02 240);
+  --secondary-foreground: oklch(0.85 0.01 240);
+  --muted: oklch(0.25 0.02 240);
+  --muted-foreground: oklch(0.65 0.01 240);
+  --accent: oklch(0.80 0.10 140); /* Softer green accent for dark mode */
+  --accent-foreground: oklch(0.12 0.02 240);
+  --destructive: oklch(0.75 0.12 15); /* Gentler red for dark mode */
+  --destructive-foreground: oklch(0.12 0.02 240);
+  --border: oklch(0.25 0.02 240);
+  --input: oklch(0.25 0.02 240);
+  --ring: oklch(0.75 0.12 250);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
@@ -116,8 +118,27 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    /* Smooth, therapeutic transitions */
+    transition: colors 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
   }
   body {
     @apply bg-background text-foreground;
+    font-family: 'Geist Sans', system-ui, -apple-system, sans-serif;
+    /* Improve text rendering for better readability */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Therapeutic design enhancements */
+  .therapeutic-card {
+    @apply bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6 shadow-lg;
+  }
+  
+  .therapeutic-button {
+    @apply bg-primary text-primary-foreground rounded-full px-6 py-3 font-medium transition-all duration-200 hover:scale-105 hover:shadow-lg;
+  }
+  
+  .therapeutic-accent {
+    @apply bg-accent/20 border-l-4 border-accent rounded-r-lg;
   }
 }

@@ -13,8 +13,10 @@ export default async function Page() {
   }
 
   return (
-    <div className={"grow flex flex-col"}>
-      <Chat accessToken={accessToken} />
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20">
+      <div className="grow flex flex-col">
+        <Chat accessToken={accessToken} />
+      </div>
     </div>
   );
 }
