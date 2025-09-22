@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { storage } from '../../../../server/storage';
 import { createToken } from '../../../../lib/auth';
+import { ensureDatabaseInitialized } from '../../../../server/initialize';
 
 export async function POST(request: NextRequest) {
+  // Ensure database constraints are initialized
+  await ensureDatabaseInitialized();
   try {
     const { email, password } = await request.json();
 

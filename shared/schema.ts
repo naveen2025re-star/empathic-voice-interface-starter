@@ -1,5 +1,5 @@
-import { pgTable, serial, text, timestamp, integer, json, boolean, varchar } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
+import { pgTable, serial, text, timestamp, integer, json, boolean, varchar, unique } from 'drizzle-orm/pg-core';
+import { relations, sql } from 'drizzle-orm';
 
 // Business accounts table
 export const businesses = pgTable('businesses', {
@@ -16,7 +16,7 @@ export const businesses = pgTable('businesses', {
 // Business context - the knowledge base for each business
 export const businessContexts = pgTable('business_contexts', {
   id: serial('id').primaryKey(),
-  businessId: integer('business_id').references(() => businesses.id).notNull(),
+  businessId: integer('business_id').references(() => businesses.id).notNull().unique(),
   companyDescription: text('company_description').notNull(),
   productsServices: text('products_services').notNull(),
   pricingInfo: text('pricing_info'),

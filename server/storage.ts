@@ -19,7 +19,7 @@ import {
   type InsertWidgetEmbedding
 } from "../shared/schema";
 import { db } from "./db";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, sql } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
 export interface IStorage {
@@ -113,6 +113,28 @@ export class DatabaseStorage implements IStorage {
     return context;
   }
 
+  async upsertBusinessContext(insertContext: InsertBusinessContext): Promise<BusinessContext> {
+    // Use proper database-level upsert with INSERT ... ON CONFLICT DO UPDATE
+    const [context] = await db
+      .insert(businessContexts)
+      .values(insertContext)
+      .onConflictDoUpdate({
+        target: businessContexts.businessId,
+        set: {
+          companyDescription: insertContext.companyDescription,
+          productsServices: insertContext.productsServices,
+          pricingInfo: insertContext.pricingInfo,
+          faqs: insertContext.faqs,
+          policies: insertContext.policies,
+          strictRules: insertContext.strictRules,
+          additionalContext: insertContext.additionalContext,
+          updatedAt: sql`NOW()`,
+        },
+      })
+      .returning();
+    return context;
+  }
+
   async createVoiceAgent(insertAgent: InsertVoiceAgent): Promise<VoiceAgent> {
     const [agent] = await db
       .insert(voiceAgents)
@@ -125,7 +147,9 @@ export class DatabaseStorage implements IStorage {
     const [agent] = await db
       .select()
       .from(voiceAgents)
-      .where(and(eq(voiceAgents.businessId, businessId), eq(voiceAgents.isActive, true)));
+      .where(and(eq(voiceAgents.businessId, businessId), eq(voiceAgents.isActive, true)))
+      .orderBy(desc(voiceAgents.createdAt))
+      .limit(1);
     return agent || undefined;
   }
 
@@ -136,6 +160,36 @@ export class DatabaseStorage implements IStorage {
       .where(eq(voiceAgents.businessId, businessId))
       .returning();
     return agent;
+  }
+
+  async upsertVoiceAgent(insertAgent: InsertVoiceAgent): Promise<VoiceAgent> {
+    // Use database transaction with proper constraint handling
+    return await db.transaction(async (tx) => {
+      // First deactivate any existing agents for this business
+      await tx
+        .update(voiceAgents)
+        .set({ isActive: false, updatedAt: sql`NOW()` })
+        .where(and(eq(voiceAgents.businessId, insertAgent.businessId), eq(voiceAgents.isActive, true)));
+
+      // Then create the new agent (always active)
+      // The unique constraint will prevent concurrent inserts of multiple active agents
+      const [agent] = await tx
+        .insert(voiceAgents)
+        .values({ ...insertAgent, isActive: true })
+        .returning();
+      
+      // Post-condition check: verify only one active agent exists
+      const activeCount = await tx
+        .select({ count: sql<number>`COUNT(*)` })
+        .from(voiceAgents)
+        .where(and(eq(voiceAgents.businessId, insertAgent.businessId), eq(voiceAgents.isActive, true)));
+      
+      if (activeCount[0].count > 1) {
+        throw new Error('Data integrity violation: Multiple active voice agents detected');
+      }
+      
+      return agent;
+    });
   }
 
   async createConversation(insertConversation: InsertConversation): Promise<Conversation> {
