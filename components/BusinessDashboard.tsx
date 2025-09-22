@@ -21,21 +21,30 @@ export default function BusinessDashboard() {
 
         {/* Hume Configuration Notice */}
         <div className="mb-8">
-          <Card className="border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/20">
+          <Card className="border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/20">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-amber-800 dark:text-amber-200">
+              <CardTitle className="flex items-center gap-2 text-blue-800 dark:text-blue-200">
                 <AlertCircle className="h-5 w-5" />
-                Voice Interface Configuration
+                Voice Interface Setup Required
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-amber-700 dark:text-amber-300 mb-4">
-                To enable the AI voice interface, you'll need to configure your Hume AI credentials. 
-                The business management system is fully functional without these credentials.
+              <p className="text-blue-700 dark:text-blue-300 mb-4">
+                Your business management system is ready! To enable the AI voice interface, you need valid Hume AI credentials.
               </p>
-              <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400">
-                <Key className="h-4 w-4" />
-                <span>Required: HUME_API_KEY, HUME_SECRET_KEY environment variables</span>
+              <div className="space-y-2 text-sm text-blue-600 dark:text-blue-400">
+                <div className="flex items-center gap-2">
+                  <Key className="h-4 w-4" />
+                  <span>1. Visit <a href="https://platform.hume.ai/" target="_blank" rel="noopener noreferrer" className="underline font-medium">platform.hume.ai</a> to get API keys</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Key className="h-4 w-4" />
+                  <span>2. Update your .env.local file with valid HUME_API_KEY and HUME_SECRET_KEY</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Key className="h-4 w-4" />
+                  <span>3. Restart the development server</span>
+                </div>
               </div>
             </CardContent>
           </Card>
