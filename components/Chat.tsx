@@ -90,7 +90,7 @@ export default function ClientComponent({
   return (
     <>
       <AuthenticatedNav />
-      <div className="relative grow flex flex-col mx-auto w-full overflow-auto min-h-0 pt-14">
+      <div className="relative grow flex flex-col mx-auto w-full min-h-0 pt-14">
         <VoiceProvider
         onMessage={() => {
           if (timeout.current) {
@@ -295,7 +295,7 @@ const SalesCoachingSession = ({
       
       <div className="flex-1 flex">
         {/* Left Pane: Coaching Tips - Always show */}
-        <div className="w-80 min-w-80 border-r border-border bg-card/50 flex flex-col">
+        <div className="flex-none relative z-10 w-80 border-r border-border bg-card/50 flex flex-col">
           <div className="p-4 border-b border-border bg-background">
             <div className="flex items-center gap-2 text-sm font-medium text-foreground">
               <svg className="size-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -315,7 +315,7 @@ const SalesCoachingSession = ({
         </div>
         
         {/* Middle: Chat Messages */}
-        <div className="flex-1">
+        <div className="flex-1 relative z-0 min-w-0">
           <Messages ref={messagesRef} />
         </div>
         
